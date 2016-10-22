@@ -1,0 +1,16 @@
+#!/bin/bash -eu
+
+grep -q 'DISTRIB_CODENAME=xenial' /etc/lsb-release || (printf "Wrong series\n" && exit 0)
+juju version|grep -qP '^2\.\d' || (printf "Wrong juju version, needs to be 2.0 or higher\n" && exit 0)
+
+dpkg -s conjure-up
+if [ $? -ne 0 ]; then
+    sudo add-apt-repository -y ppa:juju/stable
+    sudo add-apt-repository -y ppa:conjure-up/daily-git
+    sudo apt-get update
+    sudo apt-get install -y conjure-up curl
+fi
+
+conjure-up -d openstack-novalxd localhost
+
+. $HOME/.cache/conjure-up/openstack-novalxd/steps/share/novarc

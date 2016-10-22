@@ -1,5 +1,16 @@
-# conjure-up-tester
+# conjure-up-tests
 > test scripts for validating deployments
+
+# usage
+
+```
+$ bash openstack-novalxd/runtest
+```
+
+# about the tests
+
+Each directory will contain a _required_ executable script named **runscript**. This gives
+us some gaurantee when automating running through these tests.
 
 # authors
 
