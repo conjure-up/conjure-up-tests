@@ -6,6 +6,8 @@ sudo add-apt-repository -y ppa:conjure-up/daily-git
 sudo apt-get update
 sudo apt-get install -y conjure-up curl
 
+newgrp lxd
+
 VERSION=$(lxd --version)
 
 # LXD 2.3+ needs lxdbr0 setup via lxc.
@@ -22,7 +24,7 @@ if dpkg --compare-versions "$VERSION" gt "2.2"; then
 fi
 
 # LXD 2.2 and earlier use debconf to create and configure the network.
-debconf-communicate << EOF
+sudo debconf-communicate << EOF
 set lxd/setup-bridge true
 set lxd/bridge-domain lxd
 set lxd/bridge-name lxdbr0
@@ -36,9 +38,9 @@ set lxd/bridge-ipv4-nat true
 set lxd/bridge-ipv6 false
 EOF
 
-rm -rf /etc/default/lxd-bridge
+sudo rm -rf /etc/default/lxd-bridge
 
-dpkg-reconfigure lxd --frontend=noninteractive
+sudo dpkg-reconfigure lxd --frontend=noninteractive
 
 # Must run a command for systemd socket activation to start the service
 lxc config show

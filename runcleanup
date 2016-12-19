@@ -6,10 +6,10 @@ from subprocess import run, PIPE
 
 def controllers():
     out = run('juju controllers --format yaml', shell=True, stderr=PIPE, stdout=PIPE)
-    out_yaml = yaml.loads(out.stdout.decode())
-    return out_yaml.keys()
+    out_yaml = yaml.load(out.stdout.decode())
+    return out_yaml['controllers'].keys()
 
 if __name__ == "__main__":
     for controller in controllers():
         print("Destroying: {}".format(controller))
-        run('juju kill-controller -y {}'.format(controller))
+        run('juju kill-controller -y {}'.format(controller), shell=True)
