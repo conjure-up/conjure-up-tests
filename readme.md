@@ -4,13 +4,15 @@
 # usage
 
 ```
-$ bash openstack-novalxd/runtest
+$ ./runtests
 ```
 
 # about the tests
 
-Each directory will contain a _required_ executable script named **runscript**. This gives
-us some gaurantee when automating running through these tests.
+Each directory will contain a _required_ executable script named **runscript**.
+This gives us some gaurantee when automating running through these tests.
+Currently all tests can be run from a single system using the localhost
+provider.
 
 # authors
 
