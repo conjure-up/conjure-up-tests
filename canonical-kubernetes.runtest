@@ -3,6 +3,5 @@
 ./runprep
 
 conjure-up -d canonical-kubernetes localhost
-juju status
 
 ./runcleanup

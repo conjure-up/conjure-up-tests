@@ -3,6 +3,5 @@
 ./runprep
 
 conjure-up -d apache-processing-mapreduce localhost
-juju status
 
 ./runcleanup

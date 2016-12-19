@@ -3,6 +3,5 @@
 ./runprep
 
 conjure-up -d kubernetes-core localhost
-juju status
 
 ./runcleanup

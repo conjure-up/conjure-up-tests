@@ -3,6 +3,5 @@
 ./runprep
 
 conjure-up -d openstack-novalxd localhost
-juju status
 
 ./runcleanup
