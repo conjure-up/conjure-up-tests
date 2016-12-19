@@ -2,7 +2,7 @@
 
 ./runprep
 
-conjure-up -d openstack-novalxd localhost
+conjure-up -d canonical-kubernetes localhost
 juju status
 
 ./runcleanup

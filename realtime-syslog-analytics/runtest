@@ -1,0 +1,8 @@
+#!/bin/sh
+
+./runprep
+
+conjure-up -d realtime-syslog-analytics localhost
+juju status
+
+./runcleanup

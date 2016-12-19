@@ -1,0 +1,15 @@
+#!/usr/bin/env python3
+
+import sys
+import yaml
+from subprocess import run, PIPE
+
+def controllers():
+    out = run('juju controllers --format yaml', shell=True, stderr=PIPE, stdout=PIPE)
+    out_yaml = yaml.loads(out.stdout.decode())
+    return out_yaml.keys()
+
+if __name__ == "__main__":
+    for controller in controllers():
+        print("Destroying: {}".format(controller))
+        run('juju kill-controller -y {}'.format(controller))
