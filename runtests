@@ -1,8 +1,10 @@
 #!/bin/sh
 
-./openstack-novalxd.runtest
-./canonical-kubernetes.runtest
-./kubernetes-core.runtest
-./apache-processing-mapreduce.runtest
 ./ghost.runtest
+./kubernetes-core.runtest
+./canonical-kubernetes.runtest
+./apache-processing-mapreduce.runtest
 ./realtime-syslog-analytics.runtest
+
+# Longer running tests at the end
+./openstack-novalxd.runtest
