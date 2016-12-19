@@ -15,7 +15,7 @@ print(status_yaml['applications']['ghost']['units']['ghost/0']['public-address']
 
 ./runprep
 
-conjure-up -d openstack-novalxd localhost
+conjure-up -d ghost localhost
 curl --silent $(unitAddress)|grep -qP 'Welcome\sto\sGhost' || exit 1
 
 ./runcleanup
