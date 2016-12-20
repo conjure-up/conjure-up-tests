@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 unitAddress()
 {
@@ -7,15 +7,24 @@ import sys
 import yaml
 
 status_yaml=yaml.load(sys.stdin)
-print(status_yaml['applications']['ghost']['units']['ghost/0']['public-address'])
+unit = status_yaml['applications']['$1']['units']
+units = list(unit.keys())
+print(unit[units[0]]['public-address'])
 "
-    juju status ghost/0 --format yaml | env python3 -c "$py_script"
+    juju status $1 --format yaml | env python3 -c "$py_script"
 }
+
+echo "### Deploying Ghost and testing accessibility"
 
 
 ./runprep
 
 conjure-up -d ghost localhost
-curl --silent $(unitAddress)|grep -qP 'Welcome\sto\sGhost' || exit 1
+
+curl --silent $(unitAddress "haproxy")|grep -qP 'Welcome\sto\sGhost' || exit 1
+
+juju config ghost port=8888
+
+curl --silent $(unitAddress "haproxy")|grep -qP 'Welcome\sto\sGhost' || exit 1
 
 ./runcleanup
