@@ -20,6 +20,9 @@ spells=(ghost \
             openstack-novalxd)
 
 for spell in ${spells[@]}; do
+    log ""
+    log "Running $spell deployment"
+    log ""
     conjure-up $spell localhost $JUJU_CONTROLLER $JUJU_MODEL
     if [ -f $spell.verify ]; then
         log "Verifying deployment of $spell"
