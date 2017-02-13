@@ -4,10 +4,12 @@ set -eu
 
 . ./common.sh
 
+: ${CHANNEL:=edge}
+
 if ! snap list conjure-up; then
-    sudo snap install conjure-up --classic --edge
+    sudo snap install conjure-up --classic --$CHANNEL
 else
-    sudo snap refresh conjure-up --classic --edge
+    sudo snap refresh conjure-up --classic --$CHANNEL
 fi
 
 export JUJU_MODEL=conjure-up-test
