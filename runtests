@@ -1,9 +1,13 @@
 #!/bin/bash
 
-sudo snap install conjure-up --classic --edge
+set -eu
 
-MODEL=conjure-up-test
-CONTROLLER=conjure-up-controller
+. ./common.sh
+
+sudo snap install conjure-up --classic --edge || true
+
+export JUJU_MODEL=conjure-up-test
+export JUJU_CONTROLLER=conjure-up-controller
 
 spells=(ghost \
             kubernetes-core \
@@ -16,12 +20,14 @@ spells=(ghost \
             openstack-novalxd)
 
 for spell in ${spells[@]}; do
-    conjure-up $spell localhost $CONTROLLER $MODEL
+    conjure-up $spell localhost $JUJU_CONTROLLER $JUJU_MODEL
     if [ -f $spell.verify ]; then
+        log "Verifying deployment of $spell"
         ./$spell.verify
     fi
-    conjure-down $CONTROLLER $MODEL
+    conjure-down $JUJU_CONTROLLER $JUJU_MODEL
+    sleep 10
 done
 exit 0
 
-juju kill-controller -y $CONTROLLER
+juju kill-controller -y $JUJU_CONTROLLER
