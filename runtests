@@ -6,6 +6,7 @@ set -eu
 
 : ${CHANNEL:=edge}
 
+log "Checking latest conjure-up from $CHANNEL release"
 if ! snap list conjure-up; then
     sudo snap install conjure-up --classic --$CHANNEL
 else
