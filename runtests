@@ -1,10 +1,27 @@
-#!/bin/sh
+#!/bin/bash
 
-./ghost.runtest
-./kubernetes-core.runtest
-./canonical-kubernetes.runtest
-./apache-processing-mapreduce.runtest
-./realtime-syslog-analytics.runtest
+sudo snap install conjure-up --classic --edge
 
-# Longer running tests at the end
-./openstack-novalxd.runtest
+MODEL=conjure-up-test
+CONTROLLER=conjure-up-controller
+
+spells=(ghost \
+            kubernetes-core \
+            canonical-kubernetes \
+            hadoop-kafka \
+            hadoop-processing \
+            hadoop-spark \
+            realtime-syslog-analytics \
+            spark-processing \
+            openstack-novalxd)
+
+for spell in ${spells[@]}; do
+    conjure-up $spell localhost $CONTROLLER $MODEL
+    if [ -f $spell.verify ]; then
+        ./$spell.verify
+    fi
+    conjure-down $CONTROLLER $MODEL
+done
+exit 0
+
+juju kill-controller -y $CONTROLLER

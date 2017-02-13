@@ -17,7 +17,7 @@ Runs through the known spells, using the localhost provider for the majority of 
 
 # copyright
 
-2016 Canonical, Ltd.
+2016-2017 Canonical, Ltd.
 
 # license
 

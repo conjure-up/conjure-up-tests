@@ -14,17 +14,10 @@ print(unit[units[0]]['public-address'])
     juju status $1 --format yaml | env python3 -c "$py_script"
 }
 
-echo "### Deploying Ghost and testing accessibility"
-
-
-./runprep
-
-conjure-up -d ghost localhost
+echo "### Ghost testing accessibility"
 
 curl --silent $(unitAddress "haproxy")|grep -qP 'Welcome\sto\sGhost' || exit 1
 
 juju config ghost port=8888
 
 curl --silent $(unitAddress "haproxy")|grep -qP 'Welcome\sto\sGhost' || exit 1
-
-./runcleanup

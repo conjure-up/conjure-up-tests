@@ -1,7 +1,0 @@
-#!/bin/sh
-
-./runprep
-
-conjure-up -d apache-processing-mapreduce localhost
-
-./runcleanup
