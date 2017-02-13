@@ -4,7 +4,11 @@ set -eu
 
 . ./common.sh
 
-sudo snap install conjure-up --classic --edge || true
+if ! snap list conjure-up; then
+    sudo snap install conjure-up --classic --edge
+else
+    sudo snap refresh conjure-up --classic --edge
+fi
 
 export JUJU_MODEL=conjure-up-test
 export JUJU_CONTROLLER=conjure-up-controller
