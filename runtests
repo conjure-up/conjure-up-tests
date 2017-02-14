@@ -7,7 +7,7 @@ set -eu
 : ${CHANNEL:=edge}
 
 log "Checking latest conjure-up from $CHANNEL release"
-if ! snap list conjure-up || ! snap info conjure-up|grep "installed"; then
+if ! snap info conjure-up|grep -q "installed"; then
     sudo snap install conjure-up --classic --$CHANNEL
 else
     sudo snap refresh conjure-up --classic --$CHANNEL
