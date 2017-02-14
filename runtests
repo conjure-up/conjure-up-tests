@@ -5,12 +5,18 @@ set -eu
 . ./common.sh
 
 : ${CHANNEL:=edge}
+: ${USE_LXD_SNAP:=0}
 
 log "Checking latest conjure-up from $CHANNEL release"
 if ! snap info conjure-up|grep -q "installed"; then
     sudo snap install conjure-up --classic --$CHANNEL
 else
     sudo snap refresh conjure-up --classic --$CHANNEL
+fi
+
+if [ $USE_LXD_SNAP -gt 0 ]; then
+    log "Installing LXD snap"
+    sudo snap install lxd
 fi
 
 export JUJU_MODEL=conjure-up-test
