@@ -5,6 +5,7 @@ set -eu
 . ./common.sh
 
 : ${CHANNEL:=edge}
+: ${TIMEOUT:=30m}
 
 log "Checking latest conjure-up from $CHANNEL release"
 if ! snap info conjure-up|grep -q "installed"; then
@@ -30,7 +31,7 @@ for spell in ${spells[@]}; do
     log ""
     log "Running $spell deployment"
     log ""
-    conjure-up --notrack $spell localhost $JUJU_CONTROLLER $JUJU_MODEL
+    timeout -s INT $TIMEOUT conjure-up --notrack $spell localhost $JUJU_CONTROLLER $JUJU_MODEL
     if [ -f $spell.verify ]; then
         log "Verifying deployment of $spell"
         ./$spell.verify
