@@ -16,9 +16,9 @@ git clone --depth 1 -q https://github.com/conjure-up/spells $SPELLDIR
 
 test-log "Checking latest conjure-up from $CHANNEL release"
 if ! snap info conjure-up|grep -q "installed"; then
-    sudo snap install conjure-up --classic --$CHANNEL > /dev/null 2>&1
+    sudo snap install conjure-up --classic --$CHANNEL > /dev/null 2>&1 || true
 else
-    sudo snap refresh conjure-up --classic --$CHANNEL > /dev/null 2>&1
+    sudo snap refresh conjure-up --classic --$CHANNEL > /dev/null 2>&1 || true
 fi
 
 export JUJU_MODEL=conjure-up-test
