@@ -14,7 +14,7 @@ git clone --depth 1 -q https://github.com/conjure-up/spells $SPELLDIR
 : ${CHANNEL:=edge}
 : ${TIMEOUT:=30m}
 
-test-log "Checking latest conjure-up from $CHANNEL release"
+testLog "Checking latest conjure-up from $CHANNEL release"
 if ! snap info conjure-up|grep -q "installed"; then
     sudo snap install conjure-up --classic --$CHANNEL > /dev/null 2>&1 || true
 else
@@ -27,6 +27,9 @@ export JUJU_CONTROLLER=conjure-up-controller
 # TODO: provide array of clouds to test against
 export CLOUD=localhost
 
+testLog "Querying network"
+ip addr || true
+
 spells=(kubernetes-core \
             canonical-kubernetes \
             openstack-novalxd \
@@ -38,10 +41,10 @@ spells=(kubernetes-core \
             ghost)
 
 for spell in ${spells[@]}; do
-    test-log "Deploying $spell"
+    testLog "Deploying $spell"
     timeout -s INT $TIMEOUT $SPELLDIR/$spell/tests/deploy
     if [ -f $SPELLDIR/$spell/tests/verify ]; then
-        test-log "  Verifying $spell"
+        testLog "  Verifying $spell"
         $SPELLDIR/$spell/tests/verify
     fi
     conjure-down $JUJU_CONTROLLER $JUJU_MODEL
