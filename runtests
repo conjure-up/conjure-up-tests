@@ -38,7 +38,7 @@ spells=(kubernetes-core \
             ghost)
 
 for spell in ${spells[@]}; do
-    testLog "Deploying $spell"
+    testLog "Deploying $TMPDIR/$spell"
     timeout -s INT $TIMEOUT $SPELLDIR/$spell/tests/deploy --spells-dir $SPELLDIR
     if [ -f $SPELLDIR/$spell/tests/verify ]; then
         testLog "  Verifying $spell"
