@@ -11,6 +11,10 @@ $ ./runtests
 
 Runs through the known spells, using the localhost provider for the majority of tests.
 
+# runtime
+
+Currently takes about 3.5 hours to complete all tests on the localhost provider.
+
 # authors
 
 * Adam Stokes <adam.stokes@ubuntu.com>
