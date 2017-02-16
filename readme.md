@@ -7,12 +7,6 @@
 $ ./runtests
 ```
 
-Some of the tests may run indefinitely so it is suggested to use `timeout` with runtests:
-
-```
-$ timeout 10m ./runtests
-```
-
 # about the tests
 
 Runs through the known spells, using the localhost provider for the majority of tests.

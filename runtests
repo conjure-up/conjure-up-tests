@@ -12,7 +12,6 @@ git clone --depth 1 -q https://github.com/conjure-up/spells $SPELLDIR
 . $SDKDIR/common.sh
 
 : ${CHANNEL:=edge}
-: ${TIMEOUT:=30m}
 
 testLog "Checking latest conjure-up from $CHANNEL release"
 if ! snap info conjure-up|grep -q "installed"; then
@@ -39,7 +38,7 @@ spells=(kubernetes-core \
 
 for spell in ${spells[@]}; do
     testLog "Deploying $TMPDIR/$spell"
-    timeout -s INT $TIMEOUT $SPELLDIR/$spell/tests/deploy --spells-dir $SPELLDIR
+    $SPELLDIR/$spell/tests/deploy --spells-dir $SPELLDIR
     if [ -f $SPELLDIR/$spell/tests/verify ]; then
         testLog "Verifying $spell"
         $SPELLDIR/$spell/tests/verify
