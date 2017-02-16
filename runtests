@@ -27,9 +27,6 @@ export JUJU_CONTROLLER=conjure-up-controller
 # TODO: provide array of clouds to test against
 export CLOUD=localhost
 
-testLog "Querying network"
-ip addr || true
-
 spells=(kubernetes-core \
             canonical-kubernetes \
             openstack-novalxd \
