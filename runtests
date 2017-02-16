@@ -22,9 +22,9 @@ rm -rf ~/bin/kube* || true
 
 testLog "Checking latest conjure-up from $CHANNEL release"
 if ! snap info conjure-up|grep -q "installed"; then
-    sudo snap install conjure-up --classic --$CHANNEL || true
+    sudo snap install conjure-up --classic --$CHANNEL > /dev/null 2>&1 || true
 else
-    sudo snap refresh conjure-up --classic --$CHANNEL || true
+    sudo snap refresh conjure-up --classic --$CHANNEL > /dev/null 2>&1 || true
 fi
 
 export PATH=/snap/bin:$PATH
