@@ -23,6 +23,7 @@ fi
 export PATH=/snap/bin:$PATH
 export JUJU_MODEL=conjure-up-test
 export JUJU_CONTROLLER=conjure-up-controller
+export CONJURE_UP_SPELLSDIR=$SPELLDIR
 
 # TODO: provide array of clouds to test against
 export CLOUD=localhost
@@ -42,7 +43,7 @@ for spell in ${spells[@]}; do
     $SPELLDIR/$spell/tests/deploy --spells-dir $SPELLDIR
     if [ -f $SPELLDIR/$spell/tests/verify ]; then
         testLog "Verifying $spell"
-        $SPELLDIR/$spell/tests/verify
+        CONJURE_UP_SPELLSDIR=$SPELLDIR $SPELLDIR/$spell/tests/verify
     fi
     conjure-down $JUJU_CONTROLLER $JUJU_MODEL
 done
