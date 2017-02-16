@@ -4,10 +4,10 @@ set -eu
 
 TMPDIR=$(mktemp -d)
 
-SPELLDIR=$TMPDIR/spells
+: ${SPELLDIR:=$TMPDIR/spells}
 SDKDIR=$SPELLDIR/sdk
 
-git clone --depth 1 -q https://github.com/conjure-up/spells $SPELLDIR
+git clone --depth 1 -q https://github.com/conjure-up/spells $SPELLDIR || true
 
 . $SDKDIR/common.sh
 
