@@ -45,7 +45,6 @@ for spell in ${spells[@]}; do
         $SPELLDIR/$spell/tests/verify
     fi
     conjure-down $JUJU_CONTROLLER $JUJU_MODEL
-    sleep 10
 done
 
 juju kill-controller -y $JUJU_CONTROLLER
