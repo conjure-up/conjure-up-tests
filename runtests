@@ -41,7 +41,7 @@ for spell in ${spells[@]}; do
     testLog "Deploying $TMPDIR/$spell"
     timeout -s INT $TIMEOUT $SPELLDIR/$spell/tests/deploy --spells-dir $SPELLDIR
     if [ -f $SPELLDIR/$spell/tests/verify ]; then
-        testLog "  Verifying $spell"
+        testLog "Verifying $spell"
         $SPELLDIR/$spell/tests/verify
     fi
     conjure-down $JUJU_CONTROLLER $JUJU_MODEL
