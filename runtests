@@ -47,6 +47,5 @@ for spell in ${spells[@]}; do
     conjure-down $JUJU_CONTROLLER $JUJU_MODEL
     sleep 10
 done
-exit 0
 
 juju kill-controller -y $JUJU_CONTROLLER
