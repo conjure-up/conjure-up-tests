@@ -11,10 +11,10 @@ git clone --depth 1 -q https://github.com/conjure-up/spells $SPELLDIR || true
 
 . $SDKDIR/common.sh
 
-log "Sanitizing cache directory"
+testLog "Sanitizing cache directory"
 rm -rf ~/.cache/conjure-up || true
 
-log "Remove Kubernetes specific configs"
+testLog "Remove Kubernetes specific configs"
 rm -rf ~/.kube || true
 rm -rf ~/bin/kube* || true
 
