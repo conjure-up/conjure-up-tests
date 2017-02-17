@@ -67,11 +67,13 @@ do_test() {
 }
 
 tear_down_model() {
-    juju destroy-model -y $JUJU_MODEL
+    testLog "Destroying $JUJU_MODEL if exists"
+    juju destroy-model -y $JUJU_MODEL > /dev/null 2>&1
 }
 
 tear_down() {
-    juju kill-controller -y $JUJU_CONTROLLER
+    testLog "Destroying $JUJU_CONTROLLER"
+    juju kill-controller -y $JUJU_CONTROLLER > /dev/null 2>&1
 }
 
 run_core_spells() {
