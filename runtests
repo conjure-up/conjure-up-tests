@@ -40,7 +40,6 @@ fi
 export PATH=/snap/bin:$PATH
 export JUJU_MODEL=conjure-up-test
 export JUJU_CONTROLLER=conjure-up-controller
-export CONJURE_UP_SPELLSDIR=$SPELLDIR
 export CLOUD=$CLOUD
 
 core_spells=(kubernetes-core \
@@ -60,7 +59,6 @@ do_test() {
     $SPELLDIR/$_spell/tests/deploy --spells-dir $SPELLDIR
     if [ -f $SPELLDIR/$_spell/tests/verify ]; then
         testLog "Verifying $_spell"
-        # CONJURE_UP_SPELLSDIR=$SPELLDIR
         $SPELLDIR/$_spell/tests/verify
     fi
     conjure-down $JUJU_CONTROLLER $JUJU_MODEL
