@@ -5,6 +5,10 @@ set -eu
 TMPDIR=$(mktemp -d)
 
 : ${SPELLDIR:=$TMPDIR/spells}
+
+# Only run core spell tests
+: ${CORE_ONLY:=0}
+
 SDKDIR=$SPELLDIR/sdk
 
 git clone --depth 1 -q https://github.com/conjure-up/spells $SPELLDIR || true
@@ -35,24 +39,38 @@ export CONJURE_UP_SPELLSDIR=$SPELLDIR
 # TODO: provide array of clouds to test against
 export CLOUD=localhost
 
-spells=(kubernetes-core \
-            canonical-kubernetes \
-            openstack-novalxd \
-            hadoop-kafka \
+core_spells=(kubernetes-core \
+                 canonical-kubernetes \
+                 openstack-novalxd)
+
+spells=(hadoop-kafka \
             hadoop-processing \
             hadoop-spark \
             realtime-syslog-analytics \
             spark-processing \
             ghost)
 
-for spell in ${spells[@]}; do
+do_test() {
+    _spell=$1
     testLog "Deploying $TMPDIR/$spell"
     $SPELLDIR/$spell/tests/deploy --spells-dir $SPELLDIR
     if [ -f $SPELLDIR/$spell/tests/verify ]; then
         testLog "Verifying $spell"
         CONJURE_UP_SPELLSDIR=$SPELLDIR $SPELLDIR/$spell/tests/verify
     fi
-    juju kill-controller -y $JUJU_CONTROLLER
-    sleep 10
+}
+
+testLog "Running core spell tests"
+for spell in ${core_spells[@]}; do
+    do_test $spell
 done
+
+if [ "$CORE_ONLY" -eq "0" ]; then
+    testLog "Running extended spell tests"
+    for spell in ${spells[@]}; do
+        do_test $spell
+    done
+fi
+
+juju kill-controller -y $JUJU_CONTROLLER
 
