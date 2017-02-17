@@ -9,6 +9,9 @@ TMPDIR=$(mktemp -d)
 # Only run core spell tests
 : ${CORE_ONLY:=0}
 
+# Only run a single test
+: ${SPELLTEST:=""}
+
 SDKDIR=$SPELLDIR/sdk
 
 git clone --depth 1 -q https://github.com/conjure-up/spells $SPELLDIR || true
@@ -53,25 +56,41 @@ spells=(hadoop-kafka \
 do_test() {
     _spell=$1
     testLog "Using spell from $TMPDIR/$spell"
-    $SPELLDIR/$spell/tests/deploy --spells-dir $SPELLDIR
-    if [ -f $SPELLDIR/$spell/tests/verify ]; then
-        testLog "Verifying $spell"
-        CONJURE_UP_SPELLSDIR=$SPELLDIR $SPELLDIR/$spell/tests/verify
+    $SPELLDIR/$_spell/tests/deploy --spells-dir $SPELLDIR
+    if [ -f $SPELLDIR/$_spell/tests/verify ]; then
+        testLog "Verifying $_spell"
+        CONJURE_UP_SPELLSDIR=$SPELLDIR $SPELLDIR/$_spell/tests/verify
     fi
     conjure-down $JUJU_CONTROLLER $JUJU_MODEL
 }
 
-testLog "Running core spell tests"
-for spell in ${core_spells[@]}; do
-    do_test $spell
-done
+tear_down() {
+    juju kill-controller -y $JUJU_CONTROLLER
+}
 
-if [ "$CORE_ONLY" -eq "0" ]; then
-    testLog "Running extended spell tests"
-    for spell in ${spells[@]}; do
+run_core_spells() {
+    testLog "Running core spell tests"
+    for spell in ${core_spells[@]}; do
         do_test $spell
     done
+}
+
+run_extended_spells() {
+        testLog "Running extended spell tests"
+        for spell in ${spells[@]}; do
+            do_test $spell
+        done
+}
+
+if [ "$SPELLTEST" != "" ]; then
+    testLog "Running single test for $SPELLTEST"
+    do_test $SPELLTEST
+else
+    run_core_spells
 fi
 
-juju kill-controller -y $JUJU_CONTROLLER
+if [ "$CORE_ONLY" -eq "0" ]; then
+    run_extended_spells
+fi
 
+tear_down || true
