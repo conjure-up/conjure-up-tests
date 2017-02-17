@@ -66,6 +66,10 @@ do_test() {
     conjure-down $JUJU_CONTROLLER $JUJU_MODEL
 }
 
+tear_down_model() {
+    juju destroy-model -y $JUJU_MODEL
+}
+
 tear_down() {
     juju kill-controller -y $JUJU_CONTROLLER
 }
@@ -83,6 +87,8 @@ run_extended_spells() {
         do_test $spell
     done
 }
+
+tear_down_model || true
 
 if [ "$SPELLTEST" != "" ]; then
     testLog "Running single test for $SPELLTEST"
