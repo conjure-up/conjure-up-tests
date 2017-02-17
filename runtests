@@ -55,11 +55,12 @@ spells=(hadoop-kafka \
 
 do_test() {
     _spell=$1
-    testLog "Using spell from $TMPDIR/$spell"
+    testLog "Using spell from $TMPDIR/$_spell"
     $SPELLDIR/$_spell/tests/deploy --spells-dir $SPELLDIR
     if [ -f $SPELLDIR/$_spell/tests/verify ]; then
         testLog "Verifying $_spell"
-        CONJURE_UP_SPELLSDIR=$SPELLDIR $SPELLDIR/$_spell/tests/verify
+        # CONJURE_UP_SPELLSDIR=$SPELLDIR
+        $SPELLDIR/$_spell/tests/verify
     fi
     conjure-down $JUJU_CONTROLLER $JUJU_MODEL
 }
