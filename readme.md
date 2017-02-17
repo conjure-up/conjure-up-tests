@@ -15,6 +15,7 @@ juju add-machine
 juju ssh 1 <<EOF
 git clone https://github.com/conjure-up/conjure-up-tests
 cd conjure-up-tests && ./runtests
+EOF
 ```
 
 ## about the tests
