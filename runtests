@@ -52,7 +52,7 @@ spells=(hadoop-kafka \
 
 do_test() {
     _spell=$1
-    testLog "Deploying $TMPDIR/$spell"
+    testLog "Using spell from $TMPDIR/$spell"
     $SPELLDIR/$spell/tests/deploy --spells-dir $SPELLDIR
     if [ -f $SPELLDIR/$spell/tests/verify ]; then
         testLog "Verifying $spell"
