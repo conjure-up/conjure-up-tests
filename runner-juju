@@ -1,0 +1,28 @@
+#!/bin/bash
+#
+# This requires an existing juju bootstrapped environment
+set -eu
+
+MACHINE=$1 && shift
+
+# Cloud images and Trusty servers dont have current user added to lxd group.
+juju ssh $MACHINE <<'EOF'
+sudo groupadd lxd || true
+sudo usermod -a -G lxd $USER
+logout
+EOF
+
+juju ssh $MACHINE <<EOF
+rm -rf conjure-up-tests || true
+git clone https://github.com/conjure-up/conjure-up-tests
+logout
+EOF
+
+
+if [ $# -gt 0 ]; then
+  cmd="cd conjure-up-tests && $@ ./runtests"
+else
+  cmd="cd conjure-up-tests && ./runtests"
+fi
+
+juju ssh $MACHINE $cmd && exit $?
