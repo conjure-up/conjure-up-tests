@@ -59,7 +59,8 @@ do_test() {
     $SPELLDIR/$_spell/tests/deploy --spells-dir $SPELLDIR
     if [ -f $SPELLDIR/$_spell/tests/verify ]; then
         testLog "Verifying $_spell"
-        $SPELLDIR/$_spell/tests/verify
+        # Expose spells dir here since the tests will not inherit env vars from conjure-up
+        CONJURE_UP_SPELLSDIR=$SPELLDIR $SPELLDIR/$_spell/tests/verify
     fi
     conjure-down $JUJU_CONTROLLER $JUJU_MODEL
 }
