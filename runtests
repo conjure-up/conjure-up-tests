@@ -99,7 +99,7 @@ else
     run_core_spells
 fi
 
-if [ "$CORE_ONLY" -eq "0" ]; then
+if [[ "$CORE_ONLY" -eq "0" && "$SPELLTEST" = "" ]]; then
     run_extended_spells
 fi
 
