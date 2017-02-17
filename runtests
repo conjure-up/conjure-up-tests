@@ -58,6 +58,7 @@ do_test() {
         testLog "Verifying $spell"
         CONJURE_UP_SPELLSDIR=$SPELLDIR $SPELLDIR/$spell/tests/verify
     fi
+    conjure-down $JUJU_CONTROLLER $JUJU_MODEL
 }
 
 testLog "Running core spell tests"
