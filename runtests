@@ -74,7 +74,6 @@ do_test() {
         # Expose spells dir here since the tests will not inherit env vars from conjure-up
         CONJURE_UP_SPELLSDIR=$SPELLDIR $SPELLDIR/$_spell/tests/verify
     fi
-    conjure-down $JUJU_CONTROLLER $JUJU_MODEL
     tear_down || true
 }
 
