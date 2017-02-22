@@ -74,6 +74,7 @@ do_test() {
         CONJURE_UP_SPELLSDIR=$SPELLDIR $SPELLDIR/$_spell/tests/verify
     fi
     conjure-down $JUJU_CONTROLLER $JUJU_MODEL
+    tear_down || true
 }
 
 tear_down_model() {
@@ -102,7 +103,7 @@ run_extended_spells() {
     done
 }
 
-tear_down_model || true
+tear_down || true
 
 if [ "$SPELLTEST" != "" ]; then
     testLog "Running single test for $SPELLTEST"
@@ -114,5 +115,3 @@ fi
 if [[ "$CORE_ONLY" -eq "0" && "$SPELLTEST" = "" ]]; then
     run_extended_spells
 fi
-
-tear_down || true
