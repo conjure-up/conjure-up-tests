@@ -24,6 +24,7 @@ git clone --depth 1 -q https://github.com/conjure-up/spells $SPELLDIR || true
 testLog "Making sure updates are applied"
 sudo apt-get -q update
 sudo apt-get -qyf dist-upgrade
+sudo apt-get install -qyf git || true
 
 
 testLog "Sanitizing cache directory"
