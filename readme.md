@@ -27,11 +27,21 @@ juju add-machine
 
 Passing certain variables to the runner to control it's testing mechanism.
 
+**KEEP** - Do not tear down controller when finished.
+
+```
+# Juju
+./runner-juju 1 KEEP=1
+
+# Locally
+KEEP=1 ./runtests
+```
+
 **SPELLTEST** - Set this to a spell to only run this spell's test.
 
 ```
 # Juju
-SPELLTEST=openstack-novalxd ./runner-juju 1
+./runner-juju 1 SPELLTEST=openstack-novalxd
 
 # Locally
 SPELLTEST=openstack-novalxd ./runtests
@@ -45,7 +55,7 @@ git clone https://github.com/conjure-up/spells local-spells
 EOF
 
 # Juju
-SPELLDIR=$HOME/local-spells ./runner-juju 1
+./runner-juju 1 SPELLDIR=$HOME/local-spells
 
 # Locally
 SPELLDIR=$HOME/local-spells ./runtests
@@ -61,7 +71,7 @@ Current core spells:
 
 ```
 # Juju
-CORE=1 ./runner-juju 1
+./runner-juju 1 CORE=1
 
 # Locally
 CORE=1 ./runtests
