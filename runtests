@@ -33,10 +33,11 @@ rm -rf ~/bin/kube* || true
 
 : ${CHANNEL:=edge}
 
-testLog "Checking latest conjure-up from $CHANNEL release"
 if ! snap info conjure-up|grep -q "installed"; then
+    testLog "Installing conjure-up from $CHANNEL release"
     sudo snap install conjure-up --classic --$CHANNEL > /dev/null 2>&1 || true
 else
+    testLog "Upgrading conjure-up from $CHANNEL release"
     sudo snap refresh conjure-up --classic --$CHANNEL > /dev/null 2>&1 || true
 fi
 
