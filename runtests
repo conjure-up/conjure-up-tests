@@ -15,17 +15,14 @@ TMPDIR=$(mktemp -d)
 # Override cloud to test
 : ${CLOUD:=localhost}
 
-SDKDIR=$SPELLDIR/sdk
-
-. $SDKDIR/common.sh
-
-testLog "Making sure updates are applied"
 sudo apt-get -q update
 sudo apt-get -qyf dist-upgrade
 sudo apt-get install -qyf git || true
 
-testLog "Grabbing spells from upstream"
 git clone --depth 1 -q https://github.com/conjure-up/spells $SPELLDIR || true
+
+SDKDIR=$SPELLDIR/sdk
+. $SDKDIR/common.sh
 
 testLog "Sanitizing cache directory"
 rm -rf ~/.cache/conjure-up || true
