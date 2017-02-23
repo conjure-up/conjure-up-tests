@@ -108,10 +108,12 @@ tear_down || true
 if [ "$SPELLTEST" != "" ]; then
     testLog "Running single test for $SPELLTEST"
     do_test $SPELLTEST
-else
-    run_core_spells
+    exit $?
 fi
 
-if [[ "$CORE_ONLY" -eq "0" && "$SPELLTEST" = "" ]]; then
-    run_extended_spells
+if [ "$CORE_ONLY" -eq "1" ]; then
+    run_core_spells
+    exit $?
 fi
+
+run_extended_spells
