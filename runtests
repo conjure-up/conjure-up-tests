@@ -68,11 +68,20 @@ do_test() {
     _spell=$1
     testLog "Using spell from $TMPDIR/$_spell"
     conjure-up --notrack $_spell $CLOUD $JUJU_CONTROLLER $JUJU_MODEL --spells-dir $SPELLDIR
+    RET=$?
+    if [ $RET -ne "0" ]; then
+        exit $RET
+    fi
+
     if [ -f $SPELLDIR/$_spell/tests/verify ]; then
         sleep 20
         testLog "Verifying $_spell"
         # Expose spells dir here since the tests will not inherit env vars from conjure-up
         CONJURE_UP_SPELLSDIR=$SPELLDIR $SPELLDIR/$_spell/tests/verify
+        RET=$?
+        if [ $RET -ne "0" ]; then
+            exit $RET
+        fi
     fi
     tear_down || true
 }
@@ -108,12 +117,13 @@ tear_down || true
 if [ "$SPELLTEST" != "" ]; then
     testLog "Running single test for $SPELLTEST"
     do_test $SPELLTEST
-    exit $?
+    exit
 fi
 
 if [ "$CORE_ONLY" -eq "1" ]; then
     run_core_spells
-    exit $?
+    exit
 fi
 
 run_extended_spells
+exit 0
