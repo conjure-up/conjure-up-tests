@@ -67,7 +67,7 @@ spells=(hadoop-kafka \
 do_test() {
     _spell=$1
     testLog "Using spell from $TMPDIR/$_spell"
-    $SPELLDIR/$_spell/tests/deploy --spells-dir $SPELLDIR
+    conjure-up --notrack $_spell $CLOUD $JUJU_CONTROLLER $JUJU_MODEL --spells-dir $SPELLDIR
     if [ -f $SPELLDIR/$_spell/tests/verify ]; then
         sleep 20
         testLog "Verifying $_spell"
