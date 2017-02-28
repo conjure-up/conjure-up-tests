@@ -123,7 +123,9 @@ fi
 if [ "$CORE_ONLY" -eq "1" ]; then
     run_core_spells
     exit
+else
+    run_core_spells
+    run_extended_spells
 fi
 
-run_extended_spells
 exit 0
