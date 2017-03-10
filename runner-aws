@@ -1,0 +1,10 @@
+#!/bin/bash
+#
+# aws runner
+set -eu
+
+if [ $# -gt 0 ]; then
+  "CLOUD=aws $@ ./runtests"
+else
+  "CLOUD=aws ./runtests"
+fi
