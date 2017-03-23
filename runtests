@@ -28,7 +28,7 @@ SDKDIR=$SPELLDIR/sdk
 . $SDKDIR/common.sh
 
 testLog "Sanitizing cache directory"
-rm -rf ~/.cache/conjure-up || true
+rm -rf ~/.cache/conjure-up* || true
 
 testLog "Remove Kubernetes specific configs"
 rm -rf ~/.kube || true
