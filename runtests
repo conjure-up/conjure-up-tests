@@ -18,6 +18,9 @@ TMPDIR=$(mktemp -d)
 # Keep controller?
 : ${KEEP:=0}
 
+# Snap channel
+: ${CHANNEL:=edge}
+
 sudo apt-get -q update
 sudo apt-get -qyf dist-upgrade
 sudo apt-get install -qyf git python3-yaml || true
@@ -34,7 +37,6 @@ testLog "Remove Kubernetes specific configs"
 rm -rf ~/.kube || true
 rm -rf ~/bin/kube* || true
 
-: ${CHANNEL:=edge}
 
 if ! snap info conjure-up|grep -q "installed"; then
     testLog "Installing conjure-up from $CHANNEL release"
