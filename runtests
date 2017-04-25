@@ -21,7 +21,7 @@ TMPDIR=$(mktemp -d)
 # Snap channel
 : ${CHANNEL:=edge}
 
-sudo ./apt-go-fast
+sudo ~/conjure-up-tests/apt-go-fast
 sudo apt-get -q update
 DEBIAN_FRONTEND=noninteractive sudo apt-get -qyf -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold dist-upgrade
 DEBIAN_FRONTEND=noninteractive sudo apt-get install -qyf -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold git python3-yaml || true
