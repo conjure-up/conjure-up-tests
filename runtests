@@ -21,10 +21,11 @@ TMPDIR=$(mktemp -d)
 # Snap channel
 : ${CHANNEL:=edge}
 
+export DEBIAN_FRONTEND=noninteractive
 sudo ~/conjure-up-tests/apt-go-fast
-sudo apt-get -q update
-# DEBIAN_FRONTEND=noninteractive sudo apt-get -qyf -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold dist-upgrade
-DEBIAN_FRONTEND=noninteractive sudo apt-get install -qyf -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold git python3-yaml || true
+sudo -E apt-get -q update
+sudo -E apt-get -qyf -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold dist-upgrade
+sudo -E apt-get install -qyf -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold git python3-yaml || true
 
 git clone --depth 1 -q https://github.com/conjure-up/spells $SPELLDIR || true
 
