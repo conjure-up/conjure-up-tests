@@ -22,8 +22,8 @@ TMPDIR=$(mktemp -d)
 : ${CHANNEL:=edge}
 
 sudo apt-get -q update
-sudo apt-get -qyf dist-upgrade
-sudo apt-get install -qyf git python3-yaml || true
+DEBIAN_FRONTEND=noninteractive sudo apt-get -qyf -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold dist-upgrade
+DEBIAN_FRONTEND=noninteractive sudo apt-get install -qyf -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold git python3-yaml || true
 
 git clone --depth 1 -q https://github.com/conjure-up/spells $SPELLDIR || true
 
