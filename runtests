@@ -24,7 +24,7 @@ TMPDIR=$(mktemp -d)
 export DEBIAN_FRONTEND=noninteractive
 sudo -E apt-get -q update
 sudo -E apt-get -qyf -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold dist-upgrade
-sudo -E apt-get install -qyf -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold git python3-yaml || true
+sudo -E apt-get install -qyf -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold git python3-yaml apt-cacher-ng || true
 
 git clone --depth 1 -q https://github.com/conjure-up/spells $SPELLDIR || true
 
@@ -54,7 +54,7 @@ export CLOUD=$CLOUD
 
 testLog "Juju Version: $(juju version)"
 testLog "LXD Version: $(lxd --version)"
-testLog "conjure-up Version: $(conjure-up --version)"
+testLog "$(conjure-up --version)"
 
 core_spells=(kubernetes-core \
                  canonical-kubernetes \
@@ -70,7 +70,11 @@ spells=(hadoop-kafka \
 do_test() {
     _spell=$1
     testLog "Using spell from $TMPDIR/$_spell"
-    conjure-up -d --notrack $_spell $CLOUD $JUJU_CONTROLLER $JUJU_MODEL --spells-dir $SPELLDIR
+    testLog "Setting APT proxy http://$(hostname -i):3142"
+    conjure-up -d --notrack $_spell $CLOUD $JUJU_CONTROLLER $JUJU_MODEL \
+               --spells-dir $SPELLDIR \
+               --apt-proxy=http://$(hostname -i):3142 \
+               --apt-https-proxy=http://$(hostname -i):3142
     RET=$?
     if [ $RET -ne "0" ]; then
         exit $RET
