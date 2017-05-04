@@ -23,8 +23,8 @@ TMPDIR=$(mktemp -d)
 
 export DEBIAN_FRONTEND=noninteractive
 sudo -E apt-get -q update
-sudo -E apt-get -qyf -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold dist-upgrade
 sudo -E apt-get install -qyf -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold git python3-yaml apt-cacher-ng || true
+sudo -E apt-get -qyf -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold dist-upgrade
 
 git clone --depth 1 -q https://github.com/conjure-up/spells $SPELLDIR || true
 
