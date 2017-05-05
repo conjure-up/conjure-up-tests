@@ -73,8 +73,8 @@ do_test() {
     testLog "Setting APT proxy http://$(hostname -i):3142"
     conjure-up -d --notrack $_spell $CLOUD $JUJU_CONTROLLER $JUJU_MODEL \
                --spells-dir $SPELLDIR \
-               --apt-proxy=http://$(hostname -i):3142 \
-               --apt-https-proxy=http://$(hostname -i):3142
+               --apt-proxy=http://10.0.8.1:3142 \
+               --apt-https-proxy=http://10.0.8.1:3142
     RET=$?
     if [ $RET -ne "0" ]; then
         exit $RET
