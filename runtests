@@ -52,8 +52,8 @@ export JUJU_MODEL=conjure-up-test
 export JUJU_CONTROLLER=conjure-up-controller
 export CLOUD=$CLOUD
 
-testLog "Juju Version: $(juju version)"
-testLog "LXD Version: $(lxd --version)"
+testLog "Juju Version: $(conjure-up.juju version)"
+testLog "LXD Version: $(conjure-up.lxd --version)"
 testLog "$(conjure-up --version)"
 
 core_spells=(kubernetes-core \
