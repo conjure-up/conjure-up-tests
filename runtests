@@ -69,12 +69,13 @@ spells=(hadoop-kafka \
 
 do_test() {
     _spell=$1
+    _hostname=$(hostname -i)
     testLog "Using spell from $TMPDIR/$_spell"
-    testLog "Setting APT proxy http://10.0.8.1:3142"
+    testLog "Setting APT proxy http://$_hostname:3142"
     conjure-up -d --notrack $_spell $CLOUD $JUJU_CONTROLLER $JUJU_MODEL \
                --spells-dir $SPELLDIR \
-               --apt-proxy=http://10.0.8.1:3142 \
-               --apt-https-proxy=http://10.0.8.1:3142
+               --apt-proxy=http://$_hostname:3142 \
+               --apt-https-proxy=http://$_hostname:3142
     RET=$?
     if [ $RET -ne "0" ]; then
         exit $RET
