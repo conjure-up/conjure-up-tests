@@ -72,7 +72,7 @@ do_test() {
     _hostname=$(hostname -i)
     testLog "Using spell from $TMPDIR/$_spell"
     testLog "Setting APT proxy http://$_hostname:3142"
-    conjure-up -d --notrack $_spell $CLOUD $JUJU_CONTROLLER $JUJU_MODEL \
+    conjure-up -d --notrack $_spell $CLOUD \
                --spells-dir $SPELLDIR \
                --apt-proxy=http://$_hostname:3142 \
                --apt-https-proxy=http://$_hostname:3142
