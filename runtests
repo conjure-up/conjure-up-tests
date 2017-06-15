@@ -21,27 +21,23 @@ SPELLDIR=/snap/conjure-up/current/spells
 
 export DEBIAN_FRONTEND=noninteractive
 sudo -E apt-get -q update
-sudo -E apt-get install -qyf -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold git python3-yaml apt-cacher-ng || true
+sudo -E apt-get install -qyf -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold git python3-yaml apt-cacher-ng cpanminus build-essential libtest-harness-perl || true
 sudo -E apt-get -qyf -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold dist-upgrade
 
-SDKDIR=$SPELLDIR/sdk
-. $SDKDIR/common.sh
-
-testLog "Sanitizing cache directory"
-rm -rf ~/.cache/conjure-up* || true
-
-testLog "Remove Kubernetes specific configs"
-rm -rf ~/.kube || true
-rm -rf ~/bin/kube* || true
-
-
 if ! snap info conjure-up|grep -q "installed"; then
-    testLog "Installing conjure-up from $CHANNEL release"
+    printf "Installing conjure-up from %s release\n" "$CHANNEL"
     sudo snap install conjure-up --classic --$CHANNEL > /dev/null 2>&1 || true
 else
-    testLog "Upgrading conjure-up from $CHANNEL release"
+    printf "Upgrading conjure-up from %s release\n" "$CHANNEL"
     sudo snap refresh conjure-up --classic --$CHANNEL > /dev/null 2>&1 || true
 fi
+
+printf "Sanitizing cache directory"
+rm -rf ~/.cache/conjure-up* || true
+
+printf "Remove Kubernetes specific configs"
+rm -rf ~/.kube || true
+rm -rf ~/bin/kube* || true
 
 export PATH=/snap/bin:$PATH
 export JUJU_MODEL=conjure-up-test
@@ -49,9 +45,9 @@ export JUJU_CONTROLLER=conjure-up-controller
 export CONJURE_UP_SPELLSDIR=$SPELLDIR
 export CLOUD=$CLOUD
 
-testLog "Juju Version: $(conjure-up.juju version)"
-testLog "LXD Version: $(conjure-up.lxd --version)"
-testLog "$(conjure-up --version)"
+printf "Juju Version: $(conjure-up.juju version)\n"
+printf "LXD Version: $(conjure-up.lxd --version)\n"
+printf "$(conjure-up --version)\n"
 
 core_spells=(kubernetes-core canonical-kubernetes openstack-novalxd)
 
@@ -65,7 +61,7 @@ spells=(hadoop-kafka \
 do_test() {
     _spell=$1
     _hostname=$(hostname -i)
-    testLog "Setting APT proxy http://$_hostname:3142"
+    printf "Setting APT proxy http://$_hostname:3142\n"
     conjure-up -d --notrack $_spell $CLOUD \
                --apt-proxy=http://$_hostname:3142 \
                --apt-https-proxy=http://$_hostname:3142
@@ -76,7 +72,7 @@ do_test() {
 
     if [ -f $SPELLDIR/$_spell/tests/verify ]; then
         sleep 20
-        testLog "Verifying $_spell"
+        printf "Verifying $_spell\n"
         # Expose spells dir here since the tests will not inherit env vars from conjure-up
         $SPELLDIR/$_spell/tests/verify
         RET=$?
@@ -88,26 +84,26 @@ do_test() {
 }
 
 tear_down_model() {
-    testLog "Destroying $JUJU_MODEL if exists"
+    printf "Destroying $JUJU_MODEL if exists\n"
     juju destroy-model -y $JUJU_MODEL > /dev/null 2>&1
 }
 
 tear_down() {
     if [ "$KEEP" -eq "0" ]; then
-        testLog "Destroying $JUJU_CONTROLLER"
+        printf "Destroying $JUJU_CONTROLLER\n"
         juju kill-controller -y $JUJU_CONTROLLER > /dev/null 2>&1
     fi
 }
 
 run_core_spells() {
-    testLog "Running core spell tests"
+    printf "Running core spell tests\n"
     for spell in ${core_spells[@]}; do
         do_test $spell
     done
 }
 
 run_extended_spells() {
-    testLog "Running extended spell tests"
+    printf "Running extended spell tests\n"
     for spell in ${spells[@]}; do
         do_test $spell
     done
@@ -116,7 +112,7 @@ run_extended_spells() {
 tear_down_model || true
 
 if [ "$SPELLTEST" != "" ]; then
-    testLog "Running single test for $SPELLTEST"
+    printf "Running single test for $SPELLTEST\n"
     do_test $SPELLTEST
     tear_down_model || true
     exit
