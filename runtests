@@ -32,9 +32,6 @@ else
     sudo snap refresh conjure-up --classic --$CHANNEL > /dev/null 2>&1 || true
 fi
 
-printf "Settling down\n"
-sleep 5
-
 printf "Sanitizing cache directory"
 rm -rf ~/.cache/conjure-up* || true
 
