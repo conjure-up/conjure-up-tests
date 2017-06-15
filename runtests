@@ -1,10 +1,8 @@
 #!/bin/bash
 
-set -eu
+set -eux
 
-TMPDIR=$(mktemp -d)
-
-: ${SPELLDIR:=$TMPDIR/spells}
+SPELLDIR=/snap/conjure-up/current/spells
 
 # Only run core spell tests
 : ${CORE_ONLY:=0}
@@ -25,8 +23,6 @@ export DEBIAN_FRONTEND=noninteractive
 sudo -E apt-get -q update
 sudo -E apt-get install -qyf -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold git python3-yaml apt-cacher-ng || true
 sudo -E apt-get -qyf -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold dist-upgrade
-
-git clone --depth 1 -q https://github.com/conjure-up/spells $SPELLDIR || true
 
 SDKDIR=$SPELLDIR/sdk
 . $SDKDIR/common.sh
@@ -50,15 +46,14 @@ fi
 export PATH=/snap/bin:$PATH
 export JUJU_MODEL=conjure-up-test
 export JUJU_CONTROLLER=conjure-up-controller
+export CONJURE_UP_SPELLSDIR=$SPELLDIR
 export CLOUD=$CLOUD
 
 testLog "Juju Version: $(conjure-up.juju version)"
 testLog "LXD Version: $(conjure-up.lxd --version)"
 testLog "$(conjure-up --version)"
 
-core_spells=(kubernetes-core \
-                 canonical-kubernetes \
-                 openstack-novalxd)
+core_spells=(kubernetes-core canonical-kubernetes openstack-novalxd)
 
 spells=(hadoop-kafka \
             hadoop-processing \
@@ -70,10 +65,8 @@ spells=(hadoop-kafka \
 do_test() {
     _spell=$1
     _hostname=$(hostname -i)
-    testLog "Using spell from $TMPDIR/$_spell"
     testLog "Setting APT proxy http://$_hostname:3142"
     conjure-up -d --notrack $_spell $CLOUD \
-               --spells-dir $SPELLDIR \
                --apt-proxy=http://$_hostname:3142 \
                --apt-https-proxy=http://$_hostname:3142
     RET=$?
@@ -85,13 +78,13 @@ do_test() {
         sleep 20
         testLog "Verifying $_spell"
         # Expose spells dir here since the tests will not inherit env vars from conjure-up
-        CONJURE_UP_SPELLSDIR=$SPELLDIR $SPELLDIR/$_spell/tests/verify
+        $SPELLDIR/$_spell/tests/verify
         RET=$?
         if [ $RET -ne "0" ]; then
             exit $RET
         fi
     fi
-    tear_down || true
+    tear_down_model || true
 }
 
 tear_down_model() {
@@ -120,20 +113,24 @@ run_extended_spells() {
     done
 }
 
-tear_down || true
+tear_down_model || true
 
 if [ "$SPELLTEST" != "" ]; then
     testLog "Running single test for $SPELLTEST"
     do_test $SPELLTEST
+    tear_down_model || true
     exit
 fi
 
 if [ "$CORE_ONLY" -eq "1" ]; then
     run_core_spells
+    tear_down_model || true
     exit
 else
     run_core_spells
     run_extended_spells
 fi
+
+tear_down || true
 
 exit 0

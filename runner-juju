@@ -5,13 +5,6 @@ set -eu
 
 MACHINE=$1 && shift
 
-# Cloud images and Trusty servers dont have current user added to lxd group.
-juju ssh $MACHINE <<'EOF'
-sudo groupadd lxd || true
-sudo usermod -a -G lxd $USER
-logout
-EOF
-
 juju ssh $MACHINE <<EOF
 rm -rf conjure-up-tests || true
 git clone -q https://github.com/conjure-up/conjure-up-tests
