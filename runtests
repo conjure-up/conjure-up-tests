@@ -62,7 +62,7 @@ do_test() {
     _spell=$1
     _hostname=$(hostname -i)
     printf "Setting APT proxy http://$_hostname:3142\n"
-    conjure-up -d --notrack $_spell $CLOUD $JUJU_CONTROLLER $JUJU_MODEL \
+    conjure-up -d --notrack --noreport $_spell $CLOUD $JUJU_CONTROLLER $JUJU_MODEL \
                --apt-proxy=http://$_hostname:3142 \
                --apt-https-proxy=http://$_hostname:3142
     RET=$?
