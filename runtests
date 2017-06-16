@@ -5,19 +5,19 @@ set -eux
 SPELLDIR=/snap/conjure-up/current/spells
 
 # Only run core spell tests
-: ${CORE_ONLY:=0}
+: "${CORE_ONLY:=0}"
 
 # Only run a single test
-: ${SPELLTEST:=""}
+: "${SPELLTEST:=""}"
 
 # Override cloud to test
-: ${CLOUD:=localhost}
+: "${CLOUD:=localhost}"
 
 # Keep controller?
-: ${KEEP:=0}
+: "${KEEP:=0}"
 
 # Snap channel
-: ${CHANNEL:=edge}
+: "${CHANNEL:=edge}"
 
 export DEBIAN_FRONTEND=noninteractive
 sudo -E apt-get -q update
@@ -26,10 +26,10 @@ sudo -E apt-get -qyf -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--for
 
 if ! snap info conjure-up|grep -q "installed"; then
     printf "Installing conjure-up from %s release\n" "$CHANNEL"
-    sudo snap install conjure-up --classic --$CHANNEL > /dev/null 2>&1 || true
+    sudo snap install conjure-up --classic --"$CHANNEL" > /dev/null 2>&1 || true
 else
     printf "Upgrading conjure-up from %s release\n" "$CHANNEL"
-    sudo snap refresh conjure-up --classic --$CHANNEL > /dev/null 2>&1 || true
+    sudo snap refresh conjure-up --classic --"$CHANNEL" > /dev/null 2>&1 || true
 fi
 
 source $SPELLDIR/sdk/common.sh
@@ -64,19 +64,19 @@ do_test() {
     _spell=$1
     _hostname=$(hostname -i)
     testLog "Setting APT proxy http://$_hostname:3142"
-    conjure-up -d --notrack $_spell $CLOUD $JUJU_CONTROLLER $JUJU_MODEL \
-               --apt-proxy=http://$_hostname:3142 \
-               --apt-https-proxy=http://$_hostname:3142
+    conjure-up -d --notrack --noreport "$_spell" "$CLOUD" "$JUJU_CONTROLLER" "$JUJU_MODEL" \
+               --apt-proxy="http://$_hostname:3142" \
+               --apt-https-proxy="http://$_hostname:3142"
     RET=$?
     if [ $RET -ne "0" ]; then
         exit $RET
     fi
 
-    if [ -f $SPELLDIR/$_spell/tests/verify ]; then
+    if [ -f "$SPELLDIR/$_spell/tests/verify" ]; then
         sleep 20
         testLog "Verifying $_spell"
         # Expose spells dir here since the tests will not inherit env vars from conjure-up
-        $SPELLDIR/$_spell/tests/verify
+        "$SPELLDIR/$_spell/tests/verify"
         RET=$?
         if [ $RET -ne "0" ]; then
             exit $RET
@@ -99,15 +99,15 @@ tear_down() {
 
 run_core_spells() {
     testLog "Running core spell tests"
-    for spell in ${core_spells[@]}; do
-        do_test $spell
+    for spell in "${core_spells[@]}"; do
+        do_test "$spell"
     done
 }
 
 run_extended_spells() {
     testLog "Running extended spell tests"
-    for spell in ${spells[@]}; do
-        do_test $spell
+    for spell in "${spells[@]}"; do
+        do_test "$spell"
     done
 }
 
@@ -115,7 +115,7 @@ tear_down_model || true
 
 if [ "$SPELLTEST" != "" ]; then
     testLog "Running single test for $SPELLTEST"
-    do_test $SPELLTEST
+    do_test "$SPELLTEST"
     tear_down_model || true
     exit
 fi
