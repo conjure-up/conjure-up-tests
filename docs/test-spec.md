@@ -1,25 +1,25 @@
 # Test Spec
 
-Option | Description
- --- | ---
-name | name of test
-summary | brief summary of what we're testing
-prepare|
----
-before | before install
-install | install deps etc
-build|
----
-platform | python3,perl,go
-build.runner|
----
-before | before script run list
-run | script run list
-after | after script run list
-build.results|
----
-success | after test run succeeds
-fail | after test run failure
+| **Config Format** ||
+|---|---|
+| name | name of test |
+| summary | brief summary of what we're testing |
+|||
+| [**prepare**] | |
+| before | before install |
+| install | install deps etc |
+|||
+| [**build**] | |
+|platform | python3,perl,go|
+|||
+| [**build.runner**] ||
+|before | before script run list|
+|run | script run list|
+|after | after script run list|
+|||
+| [**build.result**] ||
+|success | after test run succeeds|
+|fail | after test run failure|
 
 ## Customize install
 
@@ -29,7 +29,7 @@ environment.
 
 ```toml
 [prepare]
-before_install = "./clean-prep-area"
+before = "./clean-prep-area"
 install = [
   "git clone conjure-up/conjure-up",
   "make sysdeps"
@@ -37,13 +37,6 @@ install = [
 ```
 
 ## Customize Build
-
-```toml
-[build]
-script = "prove -t xt/*"
-```
-
-Or multiple lines:
 
 ```toml
 [build]
@@ -57,6 +50,7 @@ platform = "python3"
   ]
   after = "echo 'DONE!'"
 
-  [build.after_success]
-  run = "email user@example.com, success!"
+  [build.result]
+  success = "email user@example.com, success!"
+  failure = "email user@example.com, you lose!"
 ```
