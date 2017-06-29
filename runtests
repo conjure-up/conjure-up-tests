@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eux
+set -eu
 
 SPELLDIR=/snap/conjure-up/current/spells
 
@@ -90,7 +90,7 @@ tear_down() {
 }
 
 run_spells() {
-    testLog "Running core spell tests"
+    testLog "Running spell tests"
     for spell in "${spells[@]}"; do
         do_test "$spell"
     done
