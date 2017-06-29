@@ -4,9 +4,6 @@ set -eux
 
 SPELLDIR=/snap/conjure-up/current/spells
 
-# Only run core spell tests
-: "${CORE_ONLY:=0}"
-
 # Only run a single test
 : "${SPELLTEST:=""}"
 
@@ -21,8 +18,8 @@ SPELLDIR=/snap/conjure-up/current/spells
 
 export DEBIAN_FRONTEND=noninteractive
 sudo -E apt-get -q update
-sudo -E apt-get install -qyf -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold git python3-yaml apt-cacher-ng cpanminus build-essential libtest-harness-perl || true
-sudo -E apt-get -qyf -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold dist-upgrade
+sudo -E apt-get install -qyf -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold git python3-yaml || true
+# sudo -E apt-get -qyf -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold dist-upgrade
 
 if ! snap info conjure-up|grep -q "installed"; then
     printf "Installing conjure-up from %s release\n" "$CHANNEL"
@@ -51,9 +48,10 @@ testLog "Juju Version: $(conjure-up.juju version)"
 testLog "LXD Version: $(conjure-up.lxd --version)"
 testLog "$(conjure-up --version)"
 
-core_spells=(kubernetes-core canonical-kubernetes openstack-novalxd)
-
-spells=(hadoop-kafka \
+spells=(kubernetes-core \
+            canonical-kubernetes \
+            openstack-novalxd \
+            hadoop-kafka \
             hadoop-processing \
             hadoop-spark \
             realtime-syslog-analytics \
@@ -62,7 +60,7 @@ spells=(hadoop-kafka \
 
 do_test() {
     _spell=$1
-    conjure-up -d --notrack --noreport "$_spell" "$CLOUD" "$JUJU_CONTROLLER" "$JUJU_MODEL"
+    conjure-up --notrack --noreport "$_spell" "$CLOUD" "$JUJU_CONTROLLER" "$JUJU_MODEL"
     RET=$?
     if [ $RET -ne "0" ]; then
         exit $RET
@@ -71,14 +69,12 @@ do_test() {
     if [ -f "$SPELLDIR/$_spell/tests/verify" ]; then
         sleep 20
         testLog "Verifying $_spell"
-        # Expose spells dir here since the tests will not inherit env vars from conjure-up
         "$SPELLDIR/$_spell/tests/verify"
         RET=$?
         if [ $RET -ne "0" ]; then
             exit $RET
         fi
     fi
-    tear_down_model || true
 }
 
 tear_down_model() {
@@ -93,38 +89,23 @@ tear_down() {
     fi
 }
 
-run_core_spells() {
+run_spells() {
     testLog "Running core spell tests"
-    for spell in "${core_spells[@]}"; do
-        do_test "$spell"
-    done
-}
-
-run_extended_spells() {
-    testLog "Running extended spell tests"
     for spell in "${spells[@]}"; do
         do_test "$spell"
     done
 }
 
-tear_down_model || true
+tear_down || true
 
 if [ "$SPELLTEST" != "" ]; then
     testLog "Running single test for $SPELLTEST"
     do_test "$SPELLTEST"
-    tear_down_model || true
+    tear_down || true
     exit
 fi
 
-if [ "$CORE_ONLY" -eq "1" ]; then
-    run_core_spells
-    tear_down_model || true
-    exit
-else
-    run_core_spells
-    run_extended_spells
-fi
-
+run_spells
 tear_down || true
 
 exit 0
