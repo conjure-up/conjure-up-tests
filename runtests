@@ -90,22 +90,21 @@ tear_down() {
 }
 
 run_spells() {
+    tear_down || true
     testLog "Running spell tests"
     for spell in "${spells[@]}"; do
         do_test "$spell"
+        tear_down || true
     done
 }
 
-tear_down || true
-
 if [ "$SPELLTEST" != "" ]; then
+    tear_down || true
     testLog "Running single test for $SPELLTEST"
     do_test "$SPELLTEST"
-    tear_down || true
     exit
 fi
 
 run_spells
-tear_down || true
 
 exit 0
