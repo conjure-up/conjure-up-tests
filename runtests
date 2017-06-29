@@ -46,5 +46,5 @@ spells=(kubernetes-core \
             ghost)
 
 testLog "Running spell tests"
-for spell in "${spells[@]}"; do echo "conjure-up --notrack --noreport $spell $CLOUD"; done |sprun -M 8 -e
+for spell in "${spells[@]}"; do echo "conjure-up --notrack --noreport $spell $CLOUD"; done |sprun -e
 exit 0
