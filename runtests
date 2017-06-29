@@ -4,21 +4,18 @@ set -eu
 
 SPELLDIR=/snap/conjure-up/current/spells
 
-# Only run a single test
-: "${SPELLTEST:=""}"
-
 # Override cloud to test
 : "${CLOUD:=localhost}"
-
-# Keep controller?
-: "${KEEP:=0}"
 
 # Snap channel
 : "${CHANNEL:=edge}"
 
+export PATH=/snap/bin:$PATH
+export CLOUD=$CLOUD
 export DEBIAN_FRONTEND=noninteractive
+
 sudo -E apt-get -qq update
-sudo -E apt-get install -qyf -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold git python3-yaml || true
+sudo -E apt-get install -qyf -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold git python3-yaml cpanminus libstatgrab-dev libstatgrab10 || true
 # sudo -E apt-get -qyf -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold dist-upgrade
 
 if ! snap info conjure-up|grep -q "installed"; then
@@ -31,18 +28,8 @@ fi
 
 source $SPELLDIR/sdk/common.sh
 
-testLog "Sanitizing cache directory"
-rm -rf ~/.cache/conjure-up* || true
-
-testLog "Remove Kubernetes specific configs"
-rm -rf ~/.kube || true
-rm -rf ~/bin/kube* || true
-
-export PATH=/snap/bin:$PATH
-export JUJU_MODEL=conjure-up-test
-export JUJU_CONTROLLER=conjure-up-controller
-export CONJURE_UP_SPELLSDIR=$SPELLDIR
-export CLOUD=$CLOUD
+testLog "Installing sprun"
+cpanm -n App::Prun::Scaled
 
 testLog "Juju Version: $(conjure-up.juju version)"
 testLog "LXD Version: $(conjure-up.lxd --version)"
@@ -58,53 +45,6 @@ spells=(kubernetes-core \
             spark-processing \
             ghost)
 
-do_test() {
-    _spell=$1
-    conjure-up --notrack --noreport "$_spell" "$CLOUD" "$JUJU_CONTROLLER" "$JUJU_MODEL"
-    RET=$?
-    if [ $RET -ne "0" ]; then
-        exit $RET
-    fi
-
-    if [ -f "$SPELLDIR/$_spell/tests/verify" ]; then
-        sleep 20
-        testLog "Verifying $_spell"
-        "$SPELLDIR/$_spell/tests/verify"
-        RET=$?
-        if [ $RET -ne "0" ]; then
-            exit $RET
-        fi
-    fi
-}
-
-tear_down_model() {
-    testLog "Destroying $JUJU_MODEL if exists"
-    juju destroy-model -y $JUJU_MODEL > /dev/null 2>&1
-}
-
-tear_down() {
-    if [ "$KEEP" -eq "0" ]; then
-        testLog "Destroying $JUJU_CONTROLLER"
-        juju kill-controller -y $JUJU_CONTROLLER > /dev/null 2>&1
-    fi
-}
-
-run_spells() {
-    tear_down || true
-    testLog "Running spell tests"
-    for spell in "${spells[@]}"; do
-        do_test "$spell"
-        tear_down || true
-    done
-}
-
-if [ "$SPELLTEST" != "" ]; then
-    tear_down || true
-    testLog "Running single test for $SPELLTEST"
-    do_test "$SPELLTEST"
-    exit
-fi
-
-run_spells
-
+testLog "Running spell tests"
+for spell in "${spells[@]}"; do echo "conjure-up --notrack --noreport $spell $CLOUD"; done |sprun -M 8 -e
 exit 0
