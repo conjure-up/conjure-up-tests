@@ -29,7 +29,7 @@ fi
 source $SPELLDIR/sdk/common.sh
 
 testLog "Installing sprun"
-cpanm -n App::Prun::Scaled
+sudo cpanm -n App::Prun::Scaled
 
 testLog "Juju Version: $(conjure-up.juju version)"
 testLog "LXD Version: $(conjure-up.lxd --version)"
