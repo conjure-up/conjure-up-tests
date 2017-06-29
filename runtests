@@ -35,6 +35,10 @@ testLog "Juju Version: $(conjure-up.juju version)"
 testLog "LXD Version: $(conjure-up.lxd --version)"
 testLog "$(conjure-up --version)"
 
+testLog "Creating network bridges prior"
+conjure-up.lxc network create conjureup0 ipv4.address=auto ipv6.address=none
+conjure-up.lxc network create conjureup1 ipv4.address=auto ipv6.address=none
+
 spells=(kubernetes-core \
             canonical-kubernetes \
             openstack-novalxd \
