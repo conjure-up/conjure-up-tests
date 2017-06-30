@@ -15,7 +15,7 @@ export CLOUD=$CLOUD
 export DEBIAN_FRONTEND=noninteractive
 
 sudo -E apt-get -qq update
-sudo -E apt-get install -qyf -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold git python3-yaml cpanminus libstatgrab-dev make pkg-config|| true
+sudo -E apt-get install -qyf -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold git python3-yaml parallel|| true
 # sudo -E apt-get -qyf -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold dist-upgrade
 
 if ! snap info conjure-up|grep -q "installed"; then
@@ -29,15 +29,12 @@ fi
 source $SPELLDIR/sdk/common.sh
 
 testLog "Installing sprun"
-sudo cpanm -n App::Prun::Scaled
 
 testLog "Juju Version: $(conjure-up.juju version)"
 testLog "LXD Version: $(conjure-up.lxd --version)"
 testLog "$(conjure-up --version)"
 
 testLog "Creating network bridges prior"
-conjure-up.lxc network create conjureup0 ipv4.address=auto ipv6.address=none
-conjure-up.lxc network create conjureup1 ipv4.address=auto ipv6.address=none
 
 spells=(kubernetes-core \
             canonical-kubernetes \
@@ -50,5 +47,7 @@ spells=(kubernetes-core \
             ghost)
 
 testLog "Running spell tests"
-for spell in "${spells[@]}"; do echo "conjure-up --notrack --noreport $spell $CLOUD"; done |sprun -e
+tmpfile=$(mktemp)
+for spell in "${spells[@]}"; do echo "conjure-up --notrack --noreport $spell $CLOUD" >> "$tmpfile"; done
+parallel < "$tmpfile"
 exit 0
