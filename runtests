@@ -28,8 +28,6 @@ fi
 
 source $SPELLDIR/sdk/common.sh
 
-testLog "Installing sprun"
-
 testLog "Juju Version: $(conjure-up.juju version)"
 testLog "LXD Version: $(conjure-up.lxd --version)"
 testLog "$(conjure-up --version)"
@@ -49,5 +47,5 @@ spells=(kubernetes-core \
 testLog "Running spell tests"
 tmpfile=$(mktemp)
 for spell in "${spells[@]}"; do echo "conjure-up --notrack --noreport $spell $CLOUD" >> "$tmpfile"; done
-parallel < "$tmpfile"
+parallel --delay 5 < "$tmpfile"
 exit 0
