@@ -45,6 +45,6 @@ spells=(canonical-kubernetes \
 
 testLog "Running spell tests"
 tmpfile=$(mktemp)
-for spell in "${spells[@]}"; do echo "conjure-up --notrack --noreport $spell $CLOUD" >> "$tmpfile"; done
-parallel --delay 10 < "$tmpfile"
+for spell in "${spells[@]}"; do echo "sleep $((1 + RANDOM % 10)) && conjure-up --notrack --noreport $spell $CLOUD" >> "$tmpfile"; done
+parallel < "$tmpfile"
 exit 0
