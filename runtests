@@ -35,11 +35,11 @@ testLog "$(conjure-up --version)"
 spells=(kubernetes-core \
             canonical-kubernetes \
             openstack-novalxd \
-            hadoop-kafka \
-            hadoop-processing \
+            # hadoop-kafka \
+            # hadoop-processing \
             hadoop-spark \
-            realtime-syslog-analytics \
-            spark-processing \
+            # realtime-syslog-analytics \
+            # spark-processing \
             ghost)
 
 testLog "Running spell tests"
