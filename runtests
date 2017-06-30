@@ -32,8 +32,6 @@ testLog "Juju Version: $(conjure-up.juju version)"
 testLog "LXD Version: $(conjure-up.lxd --version)"
 testLog "$(conjure-up --version)"
 
-testLog "Creating network bridges prior"
-
 spells=(kubernetes-core \
             canonical-kubernetes \
             openstack-novalxd \
@@ -47,5 +45,5 @@ spells=(kubernetes-core \
 testLog "Running spell tests"
 tmpfile=$(mktemp)
 for spell in "${spells[@]}"; do echo "conjure-up --notrack --noreport $spell $CLOUD" >> "$tmpfile"; done
-parallel --delay 5 < "$tmpfile"
+parallel --delay 10 < "$tmpfile"
 exit 0
