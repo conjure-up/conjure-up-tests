@@ -15,7 +15,7 @@ export CLOUD=$CLOUD
 export DEBIAN_FRONTEND=noninteractive
 
 sudo -E apt-get -qq update
-sudo -E apt-get install -qyf -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold git python3-yaml parallel|| true
+sudo -E apt-get install -qyf -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold git python3-yaml|| true
 # sudo -E apt-get -qyf -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold dist-upgrade
 
 if ! snap info conjure-up|grep -q "installed"; then
@@ -33,18 +33,18 @@ testLog "LXD Version: $(conjure-up.lxd --version)"
 testLog "$(conjure-up --version)"
 
 spells=(canonical-kubernetes \
-        #kubernetes-core \
+        kubernetes-core \
         openstack-novalxd \
-        # hadoop-kafka \
+        hadoop-kafka \
         hadoop-processing \
         hadoop-spark \
-        # realtime-syslog-analytics \
-        # spark-processing \
-        #ghost
-       )
+        realtime-syslog-analytics \
+        spark-processing \
+        ghost)
 
 testLog "Running spell tests"
-tmpfile=$(mktemp)
-for spell in "${spells[@]}"; do echo "sleep $((1 + RANDOM % 10)) && conjure-up --notrack --noreport $spell $CLOUD" >> "$tmpfile"; done
-parallel < "$tmpfile"
+for spell in "${spells[@]}"; do
+    conjure-up --notrack --noreport "$spell" "$CLOUD" conjure-test-controller conjure-test-model
+    juju kill-controller -y conjure-test-controller
+done
 exit 0
