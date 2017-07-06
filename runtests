@@ -32,6 +32,10 @@ testLog "Juju Version: $(conjure-up.juju version)"
 testLog "LXD Version: $(conjure-up.lxd --version)"
 testLog "$(conjure-up --version)"
 
+testLog "cgmanager or binfmt-support installed?"
+dpkg -l|grep cgmanager
+dpkg -l|grep binfmt
+
 spells=(canonical-kubernetes \
         kubernetes-core \
         openstack-novalxd \
@@ -40,7 +44,8 @@ spells=(canonical-kubernetes \
         hadoop-spark \
         realtime-syslog-analytics \
         spark-processing \
-        ghost)
+        ghost
+       )
 
 testLog "Running spell tests"
 for spell in "${spells[@]}"; do
