@@ -33,13 +33,18 @@ testLog "LXD Version: $(conjure-up.lxd --version)"
 testLog "$(conjure-up --version)"
 
 testLog "cgmanager or binfmt-support installed?"
-dpkg -l|grep cgmanager
-dpkg -l|grep binfmt
+if ! dpkg -l|grep cgmanager; then
+    testLog "cgmanager not found"
+fi
+
+if ! dpkg -l|grep binfmt; then
+    testLog "binfmt package not found"
+fi
 
 spells=(canonical-kubernetes \
         kubernetes-core \
         openstack-novalxd \
-        hadoop-kafka \
+        # hadoop-kafka \
         hadoop-processing \
         hadoop-spark \
         realtime-syslog-analytics \
