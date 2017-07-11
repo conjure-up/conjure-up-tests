@@ -28,9 +28,9 @@ fi
 
 source $SPELLDIR/sdk/common.sh
 
+snap info conjure-up
 testLog "Juju Version: $(conjure-up.juju version)"
-testLog "LXD Version: $(conjure-up.lxd --version)"
-testLog "$(conjure-up --version)"
+testLog "LXD Version: $(conjure-up.lxc version)"
 
 testLog "cgmanager or binfmt-support installed?"
 if ! dpkg -l|grep cgmanager; then
@@ -44,11 +44,11 @@ fi
 spells=(canonical-kubernetes \
         kubernetes-core \
         openstack-novalxd \
-        # hadoop-kafka \
-        hadoop-processing \
-        hadoop-spark \
-        realtime-syslog-analytics \
-        spark-processing \
+        #hadoop-kafka \
+        #hadoop-processing \
+        #hadoop-spark \
+        #realtime-syslog-analytics \
+        #spark-processing \
         ghost
        )
 
