@@ -44,11 +44,11 @@ fi
 spells=(canonical-kubernetes \
         kubernetes-core \
         openstack-novalxd \
-        #hadoop-kafka \
-        #hadoop-processing \
-        #hadoop-spark \
+        hadoop-kafka \
+        hadoop-processing \
+        hadoop-spark \
         #realtime-syslog-analytics \
-        #spark-processing \
+        spark-processing \
         ghost
        )
 
