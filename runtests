@@ -31,6 +31,8 @@ sudo service redis-server start || true
 tox -e py35,flake,isort
 tox -e conjure-dev
 
+ls -l `pwd`
+
 spells=(canonical-kubernetes \
         kubernetes-core \
         openstack-novalxd \
@@ -44,7 +46,7 @@ spells=(canonical-kubernetes \
 
 echo "Running spell tests"
 for spell in "${spells[@]}"; do
-    sudo -E su $USER -c "source conjure-up/conjure-dev/bin/activate && conjure-up -d --notrack --noreport $spell $CLOUD test-controller test-model"
+    sudo -E su $USER -c "source conjure-dev/bin/activate && conjure-up -d --notrack --noreport $spell $CLOUD test-controller test-model"
     juju destroy-model -y test-model
 done
 exit 0
