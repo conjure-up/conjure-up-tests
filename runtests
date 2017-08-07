@@ -14,7 +14,7 @@ export DEBIAN_FRONTEND=noninteractive
 export CONJUREUP_REGISTRY_BRANCH=master
 
 sudo -E apt-get -qq update
-sudo -E apt-get install -qyf -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold git python3-yaml build-essential|| true
+sudo -E apt-get install -qyf -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold git python3-yaml build-essential pwgen|| true
 sudo -E apt-get -qyf -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold dist-upgrade
 git clone -q https://github.com/conjure-up/conjure-up && cd conjure-up
 
