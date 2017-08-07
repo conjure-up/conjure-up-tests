@@ -16,6 +16,7 @@ export CONJUREUP_REGISTRY_BRANCH=master
 sudo -E apt-get -qq update
 sudo -E apt-get install -qyf -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold git python3-yaml make|| true
 sudo -E apt-get -qyf -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold dist-upgrade
+git clone -q https://github.com/conjure-up/conjure-up && cd conjure-up
 
 make travis-sysdeps
 
@@ -26,8 +27,6 @@ sudo ln -s /usr/bin/lxc /usr/bin/conjure-up.lxc
 sudo ln -s /usr/bin/lxd /usr/bin/conjure-up.lxd
 sudo service lxd start || true
 sudo service redis-server start || true
-
-git clone -q https://github.com/conjure-up/conjure-up && cd conjure-up
 
 tox -e py35,flake,isort
 tox -e conjure-dev
