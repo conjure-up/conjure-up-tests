@@ -42,7 +42,7 @@ spells=(canonical-kubernetes \
         ghost
        )
 
-testLog "Running spell tests"
+echo "Running spell tests"
 for spell in "${spells[@]}"; do
     sudo -E su $USER -c "source conjure-up/conjure-dev/bin/activate && conjure-up -d --notrack --noreport $spell $CLOUD test-controller test-model"
     juju destroy-model -y test-model
