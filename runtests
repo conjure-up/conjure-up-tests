@@ -2,8 +2,6 @@
 
 set -eu
 
-SPELLDIR=/snap/conjure-up/current/spells
-
 # Override cloud to test
 : "${CLOUD:=localhost}"
 
@@ -15,31 +13,23 @@ export CLOUD=$CLOUD
 export DEBIAN_FRONTEND=noninteractive
 
 sudo -E apt-get -qq update
-sudo -E apt-get install -qyf -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold git python3-yaml|| true
+sudo -E apt-get install -qyf -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold git python3-yaml make|| true
 sudo -E apt-get -qyf -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold dist-upgrade
 
-if ! snap info conjure-up|grep -q "installed"; then
-    printf "Installing conjure-up from %s release\n" "$CHANNEL"
-    sudo snap install conjure-up --classic --"$CHANNEL" > /dev/null 2>&1 || true
-else
-    printf "Upgrading conjure-up from %s release\n" "$CHANNEL"
-    sudo snap refresh conjure-up --classic --"$CHANNEL" > /dev/null 2>&1 || true
-fi
+make travis-sysdeps
 
-source $SPELLDIR/sdk/common.sh
+sudo addgroup lxd || true
+sudo usermod -a -G lxd $USER || true
+sudo ln -s /snap/bin/juju /usr/bin/juju
+sudo ln -s /usr/bin/lxc /usr/bin/conjure-up.lxc
+sudo ln -s /usr/bin/lxd /usr/bin/conjure-up.lxd
+sudo service lxd start || true
+sudo service redis-server start || true
 
-snap info conjure-up
-testLog "Juju Version: $(conjure-up.juju version)"
-testLog "LXD Version: $(conjure-up.lxc version)"
+git clone -q https://github.com/conjure-up/conjure-up && cd conjure-up
 
-testLog "cgmanager or binfmt-support installed?"
-if ! dpkg -l|grep cgmanager; then
-    testLog "cgmanager not found"
-fi
-
-if ! dpkg -l|grep binfmt; then
-    testLog "binfmt package not found"
-fi
+tox -e py35,flake,isort
+tox -e conjure-dev
 
 spells=(canonical-kubernetes \
         kubernetes-core \
@@ -47,14 +37,14 @@ spells=(canonical-kubernetes \
         hadoop-kafka \
         hadoop-processing \
         hadoop-spark \
-        #realtime-syslog-analytics \
+        realtime-syslog-analytics \
         spark-processing \
         ghost
        )
 
 testLog "Running spell tests"
 for spell in "${spells[@]}"; do
-    conjure-up --notrack --noreport "$spell" "$CLOUD" conjure-test-controller conjure-test-model
-    juju kill-controller -y conjure-test-controller
+    sudo -E su $USER -c "source conjure-up/conjure-dev/bin/activate && conjure-up -d --notrack --noreport $spell $CLOUD test-controller test-model"
+    juju destroy-model -y test-model
 done
 exit 0
