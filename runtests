@@ -8,40 +8,58 @@ set -eu
 # Snap channel
 : "${CHANNEL:=edge}"
 
+# tmpdir=$(mktemp -d -t tmp.XXXXXXXXX)
+
+# function cleanup {
+#     rm -rf "$tmpdir"
+#     exit 0
+# }
+# trap cleanup EXIT
+
 export PATH=/snap/bin:$PATH
 export CLOUD=$CLOUD
 export DEBIAN_FRONTEND=noninteractive
 export CONJUREUP_REGISTRY_BRANCH=master
 
-sudo -E apt-get -qq update
-sudo -E apt-get install -qyf -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold git python3-yaml build-essential pwgen|| true
-sudo -E apt-get -qyf -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold dist-upgrade
-git clone -q https://github.com/conjure-up/conjure-up && cd conjure-up
+function install_deps {
+    sudo -E apt-get -qq update
+    # sudo -E apt-get install -qyf -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold git python3-yaml build-essential pwgen|| true
+    sudo -E apt-get -qyf -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold dist-upgrade
+    # git clone -q https://github.com/conjure-up/conjure-up "$tmpdir" && cd "$tmpdir"
 
-make travis-sysdeps
+    sudo snap refresh lxd --edge
+    sudo snap install conjure-up --classic --edge
+    sudo addgroup lxd || true
+    sudo usermod -a -G lxd $USER || true
+    # sudo ln -s /snap/bin/juju /usr/bin/juju || true
+    sudo ln -s /snap/bin/lxc /usr/bin/lxc || true
+}
 
-sudo addgroup lxd || true
-sudo usermod -a -G lxd $USER || true
-sudo ln -s /snap/bin/juju /usr/bin/juju || true
-sudo ln -s /snap/bin/lxc /usr/bin/lxc || true
 
-tox -e py35,flake,isort
-tox -e conjure-dev
+function run_tox {
+    tox -e py35,flake,isort
+    tox -e conjure-dev
+}
 
-spells=(canonical-kubernetes \
-        kubernetes-core \
-        openstack-novalxd \
-        hadoop-kafka \
-        hadoop-processing \
-        hadoop-spark \
-        realtime-syslog-analytics \
-        spark-processing \
-        ghost
-       )
+function run {
+    local spells=(canonical-kubernetes \
+                      kubernetes-core \
+                      openstack-novalxd \
+                      hadoop-kafka \
+                      hadoop-processing \
+                      hadoop-spark \
+                      realtime-syslog-analytics \
+                      spark-processing \
+                      ghost
+                 )
 
-echo "Running spell tests"
-for spell in "${spells[@]}"; do
-    sudo -E su $USER -c "source conjure-dev/bin/activate && conjure-up -d --notrack --noreport $spell $CLOUD test-controller test-model"
-    juju destroy-model -y test-model
-done
-exit 0
+    echo "Running spell tests"
+    for spell in "${spells[@]}"; do
+        # sudo -E su $USER -c "source conjure-dev/bin/activate && conjure-up -d --notrack --noreport $spell $CLOUD test-controller test-model"
+        sudo -E su $USER -c "conjure-up -d --notrack --noreport $spell $CLOUD test-controller test-model"
+        juju destroy-model -y test-model
+    done
+    exit 0
+}
+
+run
