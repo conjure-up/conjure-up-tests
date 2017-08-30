@@ -28,7 +28,7 @@ function install_deps {
     # git clone -q https://github.com/conjure-up/conjure-up "$tmpdir" && cd "$tmpdir"
 
     sudo snap refresh lxd --edge
-    sudo snap install conjure-up --classic --edge
+    sudo snap install conjure-up --classic --edge || sudo snap refresh conjure-up --edge
     sudo addgroup lxd || true
     sudo usermod -a -G lxd $USER || true
     # sudo ln -s /snap/bin/juju /usr/bin/juju || true
@@ -56,7 +56,7 @@ function run {
     echo "Running spell tests"
     for spell in "${spells[@]}"; do
         # sudo -E su $USER -c "source conjure-dev/bin/activate && conjure-up -d --notrack --noreport $spell $CLOUD test-controller test-model"
-        sudo -E su $USER -c "conjure-up -d --notrack --noreport $spell $CLOUD test-controller test-model"
+        sudo -E su $USER -c "/snap/bin/conjure-up -d --notrack --noreport $spell $CLOUD test-controller test-model"
         juju destroy-model -y test-model
     done
     exit 0
