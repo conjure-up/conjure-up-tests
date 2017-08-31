@@ -62,5 +62,6 @@ function run {
     exit 0
 }
 
+juju destroy-model -y test-model || true
 install_deps
 run
