@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eu
+set -eux
 
 # Override cloud to test
 : "${CLOUD:=localhost}"
@@ -27,8 +27,8 @@ function install_deps {
     sudo -E apt-get -qyf -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold dist-upgrade
     # git clone -q https://github.com/conjure-up/conjure-up "$tmpdir" && cd "$tmpdir"
 
-    sudo snap refresh lxd --edge
-    sudo snap install conjure-up --classic --edge || sudo snap refresh conjure-up --edge
+    sudo snap refresh lxd
+    sudo snap install conjure-up --classic "--$CHANNEL" || sudo snap refresh conjure-up "--$CHANNEL"
     sudo addgroup lxd || true
     sudo usermod -a -G lxd $USER || true
     # sudo ln -s /snap/bin/juju /usr/bin/juju || true
