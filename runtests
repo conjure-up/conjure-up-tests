@@ -27,11 +27,11 @@ function install_deps {
     sudo -E apt-get -qyf -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold dist-upgrade
     # git clone -q https://github.com/conjure-up/conjure-up "$tmpdir" && cd "$tmpdir"
 
+    sudo apt-get -qyf remove lxd lxd-client || true
     sudo snap refresh lxd
     sudo snap install conjure-up --classic "--$CHANNEL" || sudo snap refresh conjure-up "--$CHANNEL"
     sudo addgroup lxd || true
     sudo usermod -a -G lxd $USER || true
-    # sudo ln -s /snap/bin/juju /usr/bin/juju || true
     sudo ln -s /snap/bin/lxc /usr/bin/lxc || true
 }
 
@@ -55,8 +55,7 @@ function run {
 
     echo "Running spell tests"
     for spell in "${spells[@]}"; do
-        # sudo -E su $USER -c "source conjure-dev/bin/activate && conjure-up -d --notrack --noreport $spell $CLOUD test-controller test-model"
-        sudo -E su $USER -c "/snap/bin/conjure-up -d --notrack --noreport $spell $CLOUD test-controller test-model"
+        sudo -E su $USER -c "/snap/bin/conjure-up --color=never -d --notrack --noreport $spell $CLOUD test-controller test-model"
         juju destroy-model -y test-model
     done
     exit 0
