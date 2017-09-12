@@ -28,7 +28,7 @@ function install_deps {
     # git clone -q https://github.com/conjure-up/conjure-up "$tmpdir" && cd "$tmpdir"
 
     sudo apt-get -qyf remove lxd lxd-client || true
-    sudo snap refresh lxd
+    sudo snap refresh lxd || sudo snap install lxd
     sudo snap install conjure-up --classic "--$CHANNEL" || sudo snap refresh conjure-up "--$CHANNEL"
     sudo addgroup lxd || true
     sudo usermod -a -G lxd $USER || true
