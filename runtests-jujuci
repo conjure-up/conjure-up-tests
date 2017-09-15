@@ -1,0 +1,61 @@
+#!/bin/bash
+
+set -eux
+
+# Override cloud to test
+: "${CLOUD:=localhost}"
+
+# Snap channel
+: "${CHANNEL:=edge}"
+
+# tmpdir=$(mktemp -d -t tmp.XXXXXXXXX)
+
+# function cleanup {
+#     rm -rf "$tmpdir"
+#     exit 0
+# }
+# trap cleanup EXIT
+
+export PATH=/snap/bin:$PATH
+export CLOUD=$CLOUD
+export DEBIAN_FRONTEND=noninteractive
+export CONJUREUP_REGISTRY_BRANCH=master
+
+function install_deps {
+    sudo -E apt-get -qq update
+    # sudo -E apt-get install -qyf -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold git python3-yaml build-essential pwgen|| true
+    sudo -E apt-get -qyf -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold dist-upgrade
+    # git clone -q https://github.com/conjure-up/conjure-up "$tmpdir" && cd "$tmpdir"
+
+    sudo apt-get -qyf remove lxd lxd-client || true
+    sudo snap refresh lxd || sudo snap install lxd
+    sudo snap install conjure-up --classic "--$CHANNEL" || sudo snap refresh conjure-up "--$CHANNEL"
+    sudo addgroup lxd || true
+    sudo usermod -a -G lxd $USER || true
+    sudo ln -s /snap/bin/lxc /usr/bin/lxc || true
+}
+
+
+function run_tox {
+    tox -e py35,flake,isort
+    tox -e conjure-dev
+}
+
+function run {
+    local spells=(canonical-kubernetes \
+                      openstack-novalxd \
+                      hadoop-kafka \
+                      hadoop-spark
+                 )
+
+    echo "Running spell tests"
+    for spell in "${spells[@]}"; do
+        sudo -E su $USER -c "/snap/bin/conjure-up --color=never --notrack --noreport $spell $CLOUD test-controller test-model"
+        juju destroy-model -y test-model
+    done
+    exit 0
+}
+
+juju destroy-model -y test-model || true
+install_deps
+run
