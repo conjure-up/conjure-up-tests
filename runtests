@@ -42,6 +42,9 @@ function run_tox {
 }
 
 function run {
+    lxd init --auto || true
+    lxc network create lxdbr0 ipv4.address=auto ipv4.nat=true ipv6.address=none ipv6.nat=false || true
+
     local spells=(canonical-kubernetes \
                       kubernetes-core \
                       openstack-novalxd \
