@@ -1,61 +1,77 @@
 #!/bin/bash
 
-set -eux
+set -x
+export USER=jenkins
+export PATH=/snap/bin:$HOME/juju-ci-tools:$PATH
+export JUJU_REPOSITORY=$HOME/repository
+export JUJU_HOME=$HOME/cloud-city
+source $JUJU_HOME/ec2rc
+source $JUJU_HOME/juju-qa.jujuci
 
-# Override cloud to test
-: "${CLOUD:=localhost}"
+startInstance() {
+    AMI_IMAGE=$(get_ami.py --virt hvm  xenial amd64)
+    INSTANCE_TYPE="c5.4xlarge"
+    # we want a big root disk, use unique number in case we have to cleanup later
+    instanceid=$(AMI_IMAGE=$AMI_IMAGE INSTANCE_TYPE=$INSTANCE_TYPE ec2-run-instance-get-id --block-device-mapping /dev/sda1=:100)
 
-# Snap channel
-: "${CHANNEL:=edge}"
-
-# tmpdir=$(mktemp -d -t tmp.XXXXXXXXX)
-
-# function cleanup {
-#     rm -rf "$tmpdir"
-#     exit 0
-# }
-# trap cleanup EXIT
-
-export PATH=/snap/bin:$PATH
-export CLOUD=$CLOUD
-export DEBIAN_FRONTEND=noninteractive
-export CONJUREUP_REGISTRY_BRANCH=master
-
-function install_deps {
-    sudo -E apt-get -qq update
-    # sudo -E apt-get install -qyf -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold git python3-yaml build-essential pwgen|| true
-    sudo -E apt-get -qyf -o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confold dist-upgrade
-    # git clone -q https://github.com/conjure-up/conjure-up "$tmpdir" && cd "$tmpdir"
-
-    sudo apt-get -qyf remove lxd lxd-client || true
-    sudo snap refresh lxd || sudo snap install lxd
-    sudo snap install conjure-up --classic "--$CHANNEL" || sudo snap refresh conjure-up "--$CHANNEL"
-    sudo addgroup lxd || true
-    sudo usermod -a -G lxd $USER || true
-    sudo ln -s /snap/bin/lxc /usr/bin/lxc || true
-}
-
-
-function run_tox {
-    tox -e py35,flake,isort
-    tox -e conjure-dev
-}
-
-function run {
-    local spells=(canonical-kubernetes \
-                      openstack-novalxd \
-                      hadoop-kafka \
-                      hadoop-spark
-                 )
-
-    echo "Running spell tests"
-    for spell in "${spells[@]}"; do
-        sudo -E su $USER -c "/snap/bin/conjure-up --color=never --notrack --noreport $spell $CLOUD test-controller test-model"
-        juju destroy-model -y test-model
+    # tag job
+    for attempt in $(seq 5); do
+        if ec2-tag-job-instances $instanceid; then
+            break
+        elif [ "$attempt" == "5" ]; then
+            exit 1
+        fi
+        sleep 30
     done
-    exit 0
+    NODE=$(ec2-get-name $instanceid)
+    wait-for-port $NODE 22
 }
 
-juju destroy-model -y test-model || true
-install_deps
-run
+stopInstance() {
+    ec2-terminate-job-instances
+}
+
+# annotate each output line with timestamp
+annotate() {
+    set -o pipefail
+    eval "$*" 2>&1 | awk '{ print strftime("%Y-%m-%d %H:%M:%S"), $0; fflush(); }'
+}
+
+# store command in heredoc to avoid weird ssh buffering issues
+# https://serverfault.com/questions/315150/no-tty-present-when-running-commands-over-ssh-in-here-document
+ssh_main="$(cat <<'EOF'
+    set -x
+
+    sudo snap install lxd
+    id  # verify lxd group
+    /snap/bin/lxd init --auto
+    /snap/bin/lxc network create lxdbr0 ipv4.nat=true ipv4.address=auto ipv6.address=none ipv6.nat=false
+
+    set -e
+    sudo snap install conjure-up --classic --edge
+
+    spells=(canonical-kubernetes \
+            hadoop-processing \
+            spark-processing \
+            hadoop-spark
+            # skip novalxd tests until we can fix setting lxd defaults for headless
+            # openstack-novalxd
+           )
+
+    for spell in "${spells[@]}"; do
+        /snap/bin/conjure-up --debug --notrack --noreport --color=never $spell localhost test-controller test-model
+        /snap/bin/juju destroy-model -y test-model
+    done
+EOF
+)"
+
+main() {
+    set -x
+    startInstance
+    ssh -tt -o "StrictHostKeyChecking no" -o "ServerAliveInterval 60" -o "ServerAliveCountMax 110" ubuntu@$NODE "$ssh_main"
+    ret=$?
+    scp -r -o "StrictHostKeyChecking no" ubuntu@$NODE:.cache/conjure-up $WORKSPACE/cache-conjure-up
+    stopInstance
+    exit $ret
+}
+annotate main

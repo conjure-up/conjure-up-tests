@@ -52,11 +52,11 @@ function run {
     lxc network create lxdbr0 ipv4.address=auto ipv4.nat=true ipv6.address=none ipv6.nat=false || true
 
     local spells=(canonical-kubernetes \
-                      kubernetes-core \
+                      # kubernetes-core \
                       # openstack-novalxd \
                       hadoop-processing \
                       hadoop-spark \
-                      spark-processing \
+                      spark-processing
                  )
 
     echo "Running spell tests"
