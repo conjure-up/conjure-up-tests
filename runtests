@@ -47,13 +47,10 @@ function run {
 
     local spells=(canonical-kubernetes \
                       kubernetes-core \
-                      openstack-novalxd \
-                      hadoop-kafka \
+                      # openstack-novalxd \
                       hadoop-processing \
                       hadoop-spark \
-                      realtime-syslog-analytics \
                       spark-processing \
-                      ghost
                  )
 
     echo "Running spell tests"
