@@ -37,7 +37,7 @@ function install_deps {
     sudo snap refresh lxd || sudo snap install lxd
     sudo snap install conjure-up --classic "--$CHANNEL" || sudo snap refresh conjure-up "--$CHANNEL"
     sudo addgroup lxd || true
-    sudo usermod -a -G lxd $USER || true
+    sudo usermod -a -G lxd "$USER" || true
     sudo ln -s /snap/bin/lxc /usr/bin/lxc || true
 }
 
@@ -52,8 +52,7 @@ function run {
     lxc network create lxdbr0 ipv4.address=auto ipv4.nat=true ipv6.address=none ipv6.nat=false || true
 
     local spells=(canonical-kubernetes \
-                      # kubernetes-core \
-                      # openstack-novalxd \
+                      openstack-novalxd \
                       hadoop-processing \
                       hadoop-spark \
                       spark-processing
@@ -61,7 +60,7 @@ function run {
 
     echo "Running spell tests"
     for spell in "${spells[@]}"; do
-        sudo -E su $USER -c "/snap/bin/conjure-up --color=never --notrack --noreport $spell $CLOUD test-controller test-model"
+        sudo -E su "$USER" -c "/snap/bin/conjure-up --color=never --notrack --noreport $spell $CLOUD test-controller test-model"
         juju destroy-model -y test-model
     done
     exit 0
