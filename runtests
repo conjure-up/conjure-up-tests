@@ -58,8 +58,10 @@ function run {
 
     echo "Running spell tests"
     for spell in "${spells[@]}"; do
-        sudo -E su "$USER" -c "/snap/bin/conjure-up --color=never --notrack --noreport $spell $CLOUD test-controller test-model"
-        juju destroy-model -y test-model
+        local testmodel
+        testmodel=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
+        sudo -E su "$USER" -c "/snap/bin/conjure-up --color=never --notrack --noreport $spell $CLOUD test-controller $testmodel"
+        juju destroy-model -y "$testmodel"
     done
     exit 0
 }
