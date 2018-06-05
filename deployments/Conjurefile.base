@@ -1,0 +1,7 @@
+# -*- mode:yaml; -*-
+
+cloud: localhost
+no-report: true
+no-track: true
+controller: conjure-tester
+model: conjure-tester-model
