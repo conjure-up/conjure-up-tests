@@ -42,6 +42,5 @@ function run {
 }
 
 juju destroy-model -y test-model || true
-annotate install_deps
 annotate run_tox
 annotate run
