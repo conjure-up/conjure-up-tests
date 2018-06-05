@@ -8,11 +8,18 @@ set -eux
 # Snap channel
 : "${CHANNEL:=edge}"
 
+tmpdir=$(mktemp -d -t tmp.XXXXXXXXX)
+
+function cleanup {
+    rm -rf "$tmpdir"
+    exit 0
+}
+trap cleanup EXIT
+
 export PATH=/snap/bin:$PATH
 export CLOUD=$CLOUD
 export DEBIAN_FRONTEND=noninteractive
 export CONJUREUP_REGISTRY_BRANCH=master
-export CONJUREUP_BASEDIR=/home/ubuntu/conjure-up
 
 # annotate each output line with timestamp
 annotate() {
@@ -20,9 +27,20 @@ annotate() {
     eval "$*" 2>&1 | awk '{ print strftime("%Y-%m-%d %H:%M:%S"), $0; fflush(); }'
 }
 
+function install_deps {
+    git clone -q https://github.com/conjure-up/conjure-up "$tmpdir"
+    make travis-sysdeps
+    sudo addgroup lxd || true
+    sudo usermod -a -G lxd "$USER" || true
+    sudo ln -s /snap/bin/lxc /usr/bin/lxc || true
+    sudo ln -s /snap/bin/juju /usr/bin/juju || true
+    sudo bash -c 'for i in 5 10 15 30; do [[ -e /var/snap/lxd/common/lxd/unix.socket ]] && break; sleep $i; done'
+}
+
+
 function run_tox {
-    cd "$CONJUREUP_BASEDIR" && tox -e py35,flake,isort
-    cd "$CONJUREUP_BASEDIR" && tox -e conjure-dev
+    cd $tmpdir && tox -e py35,flake,isort
+    cd $tmpdir && tox -e conjure-dev
 }
 
 function run {
@@ -35,7 +53,7 @@ function run {
 
     echo "Running spell tests"
     for spell in "${spells[@]}"; do
-        sudo -E su "$USER" -c "source $CONJUREUP_BASEDIR/conjure-dev/bin/activate && conjure-up -c $CONJUREUP_BASEDIR/deployments/Conjurefile -c $CONJUREUP_BASEDIR/deployments/Conjurefile.$CLOUD.$spell"
+        sudo -E su "$USER" -c "source $tmpdir/conjure-dev/bin/activate && conjure-up -c $tmpdir/deployments/Conjurefile -c $tmpdir/deployments/Conjurefile.$CLOUD.$spell"
         juju destroy-model -y test-model
     done
     exit 0
