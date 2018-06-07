@@ -32,7 +32,7 @@ function run {
     echo "Running spell tests"
     for spell in "${spells[@]}"; do
         sudo -E su "$USER" -c "source $CONJUREUP_BASEDIR/conjure-dev/bin/activate && conjure-up -c $CONJUREUP_TESTDIR/deployments/Conjurefile.base -c $CONJUREUP_TESTDIR/deployments/Conjurefile.$CLOUD.$spell" || cat ~/.cache/conjure-up/conjure-up.log && cat ~/.cache/conjure-up/canonical-kubernetes/*.err && cat ~/.cache/conjure-up/canonical-kubernetes/steps/*/*.err
-        juju destroy-model -y test-model
+        juju destroy-model -y conjure-tester-model
     done
 }
 
