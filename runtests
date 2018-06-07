@@ -21,6 +21,7 @@ annotate() {
 }
 
 function run_tox {
+    git clone https://github.com/conjure-up/conjure-up-tests $CONJUREUP_BASEDIR
     cd "$CONJUREUP_BASEDIR" && tox -e py35,flake,isort
     cd "$CONJUREUP_BASEDIR" && tox -e conjure-dev
 }
