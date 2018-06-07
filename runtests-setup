@@ -12,7 +12,7 @@ sudo apt-get remove -qy lxd lxd-client
 sudo apt-get -y install jq bsdtar python3.6-dev make snapd libsodium-dev python3-pip
 sudo -H pip3 install tox
 sudo snap install juju --classic || sudo snap refresh juju
-sudo snap refresh lxd
+sudo snap install lxd || sudo snap refresh lxd
 sudo snap install juju-wait --classic
 sudo addgroup lxd || true
 sudo usermod -a -G lxd "$USER" || true
