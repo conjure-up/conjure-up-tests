@@ -1,0 +1,5 @@
+#!/bin/bash
+#
+# Basic teardown setup
+juju switch jenkins-ci-aws
+juju destroy-model conjure-up-tester -y || true
