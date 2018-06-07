@@ -52,7 +52,7 @@ sudo ln -s /snap/bin/juju /usr/bin/juju || true
 sudo bash -c 'for i in 5 10 15 30; do [[ -e /var/snap/lxd/common/lxd/unix.socket ]] && break; sleep $i; done'
 sudo ls -lh /var/snap/lxd/common/lxd/unix.socket
 sudo -E su "$USER" -c "/snap/bin/lxd init --auto"
-sudo -E su "$USER" -c "/snap/bin/lxd init --auto"
+sudo -E su "$USER" -c "/snap/bin/lxc network create lxdbr0 ipv4.address=auto ipv4.nat=true ipv6.address=none ipv6.nat=false || true"
 
 annotate run
 juju kill-controller -y conjure-tester
