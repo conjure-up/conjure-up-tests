@@ -21,12 +21,10 @@ annotate() {
     eval "$*" 2>&1 | awk '{ print strftime("%Y-%m-%d %H:%M:%S"), $0; fflush(); }'
 }
 
-function run_tox {
+function run {
     cd "$CONJUREUP_BASEDIR" && tox -e py35,flake,isort
     cd "$CONJUREUP_BASEDIR" && tox -e conjure-dev
-}
 
-function run {
     local spells=(kubernetes \
                       openstack
                  )
@@ -36,7 +34,7 @@ function run {
         sudo -E su "$USER" -c "source $CONJUREUP_BASEDIR/conjure-dev/bin/activate && conjure-up -c $CONJUREUP_TESTDIR/deployments/Conjurefile.base -c $CONJUREUP_TESTDIR/deployments/Conjurefile.$CLOUD.$spell"
         juju destroy-model -y test-model
     done
-    exit 0
+    cat ~/.cache/conjure-up/conjure-up.log
 }
 
 git clone https://github.com/conjure-up/conjure-up $CONJUREUP_BASEDIR
@@ -44,21 +42,19 @@ sudo add-apt-repository -y ppa:jonathonf/python-3.6
 sudo apt-get update -q
 sudo apt-get remove -qy lxd lxd-client
 sudo apt-get -y install jq bsdtar python3.6-dev make snapd libsodium-dev python3-pip
-sudo pip3 install tox
+sudo -H pip3 install tox
 sudo snap install juju --classic || sudo snap refresh juju
-sudo snap install lxd || sudo snap refresh lxd
+sudo snap refresh lxd
 sudo snap install juju-wait --classic
 sudo addgroup lxd || true
 sudo usermod -a -G lxd "$USER" || true
 sudo ln -s /snap/bin/lxc /usr/bin/lxc || true
 sudo ln -s /snap/bin/juju /usr/bin/juju || true
 sudo bash -c 'for i in 5 10 15 30; do [[ -e /var/snap/lxd/common/lxd/unix.socket ]] && break; sleep $i; done'
-
-lxd init --auto || true
-lxc network create lxdbr0 ipv4.address=auto ipv4.nat=true ipv6.address=none ipv6.nat=false || true
-lxc profile show default
-run
-
 juju destroy-model -y test-model || true
-annotate run_tox
+
+# lxd init --auto
+# lxc network create lxdbr0 ipv4.address=auto ipv4.nat=true ipv6.address=none ipv6.nat=false
+# lxc profile show default
+
 annotate run
