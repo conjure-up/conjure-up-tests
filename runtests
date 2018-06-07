@@ -13,6 +13,7 @@ export CLOUD=$CLOUD
 export DEBIAN_FRONTEND=noninteractive
 export CONJUREUP_REGISTRY_BRANCH=master
 export CONJUREUP_BASEDIR=/home/ubuntu/conjure-up
+export CONJUREUP_TESTDIR=/home/ubuntu/conjure-up-tests
 
 # annotate each output line with timestamp
 annotate() {
@@ -35,7 +36,7 @@ function run {
 
     echo "Running spell tests"
     for spell in "${spells[@]}"; do
-        sudo -E su "$USER" -c "source $CONJUREUP_BASEDIR/conjure-dev/bin/activate && conjure-up -c $CONJUREUP_BASEDIR/deployments/Conjurefile -c $CONJUREUP_BASEDIR/deployments/Conjurefile.$CLOUD.$spell"
+        sudo -E su "$USER" -c "source $CONJUREUP_BASEDIR/conjure-dev/bin/activate && conjure-up -c $CONJUREUP_TESTDIR/deployments/Conjurefile -c $CONJUREUP_TESTDIR/deployments/Conjurefile.$CLOUD.$spell"
         juju destroy-model -y test-model
     done
     exit 0
