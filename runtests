@@ -41,7 +41,7 @@ function run {
     exit 0
 }
 
-git clone https://github.com/conjure-up/conjure-up-tests $CONJUREUP_BASEDIR
+git clone https://github.com/conjure-up/conjure-up $CONJUREUP_BASEDIR
 sudo add-apt-repository -y ppa:jonathonf/python-3.6
 sudo apt-get update -q
 sudo apt-get remove -qy lxd lxd-client
