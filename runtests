@@ -36,7 +36,7 @@ function run {
 
     echo "Running spell tests"
     for spell in "${spells[@]}"; do
-        sudo -E su "$USER" -c "source $CONJUREUP_BASEDIR/conjure-dev/bin/activate && conjure-up -c $CONJUREUP_TESTDIR/deployments/Conjurefile -c $CONJUREUP_TESTDIR/deployments/Conjurefile.$CLOUD.$spell"
+        sudo -E su "$USER" -c "source $CONJUREUP_BASEDIR/conjure-dev/bin/activate && conjure-up -c $CONJUREUP_TESTDIR/deployments/Conjurefile.base -c $CONJUREUP_TESTDIR/deployments/Conjurefile.$CLOUD.$spell"
         juju destroy-model -y test-model
     done
     exit 0
