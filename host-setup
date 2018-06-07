@@ -10,4 +10,4 @@ juju-wait -w
 juju ssh ubuntu/0 sudo apt-get update && sudo apt-get install git -qyf
 juju ssh ubuntu/0 sudo apt-get remove
 juju ssh ubuntu/0 git clone -q https://github.com/conjure-up/conjure-up-tests /home/ubuntu/conjure-up-tests
-juju ssh ubuntu/0 /home/ubuntu/conjure-up-tests/runtests-setup
+juju ssh ubuntu/0 cd /home/ubuntu/conjure-up-tests && ./runtests-setup

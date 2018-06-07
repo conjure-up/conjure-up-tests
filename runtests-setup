@@ -2,21 +2,7 @@
 
 set -eux
 
-# Override cloud to test
-: "${CLOUD:=localhost}"
-
-# Snap channel
-: "${CHANNEL:=edge}"
-
-# Spell
-: "${SPELL:=kubernetes}"
-
-export PATH=/snap/bin:$PATH
-export CLOUD=$CLOUD
-export DEBIAN_FRONTEND=noninteractive
-export CONJUREUP_REGISTRY_BRANCH=master
-export CONJUREUP_BASEDIR=/home/ubuntu/conjure-up
-export CONJUREUP_TESTDIR=/home/ubuntu/conjure-up-tests
+. vars
 
 git clone https://github.com/conjure-up/conjure-up $CONJUREUP_BASEDIR || true
 

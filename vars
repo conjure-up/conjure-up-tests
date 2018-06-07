@@ -1,0 +1,5 @@
+export PATH=/snap/bin:$PATH
+export DEBIAN_FRONTEND=noninteractive
+export CONJUREUP_REGISTRY_BRANCH=master
+export CONJUREUP_BASEDIR=/home/ubuntu/conjure-up
+export CONJUREUP_TESTDIR=/home/ubuntu/conjure-up-tests
