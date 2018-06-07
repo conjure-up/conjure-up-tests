@@ -21,7 +21,6 @@ annotate() {
 }
 
 function run_tox {
-    git clone https://github.com/conjure-up/conjure-up-tests $CONJUREUP_BASEDIR
     cd "$CONJUREUP_BASEDIR" && tox -e py35,flake,isort
     cd "$CONJUREUP_BASEDIR" && tox -e conjure-dev
 }
@@ -41,6 +40,9 @@ function run {
     done
     exit 0
 }
+
+git clone https://github.com/conjure-up/conjure-up-tests $CONJUREUP_BASEDIR
+sudo snap install juju --classic || sudo snap refresh juju
 
 juju destroy-model -y test-model || true
 annotate run_tox
