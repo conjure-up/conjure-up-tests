@@ -1,0 +1,4 @@
+#!/bin/bash
+
+sudo -E su "$USER" -c "source $CONJUREUP_BASEDIR/conjure-dev/bin/activate && conjure-up -c $CONJUREUP_TESTDIR/deployments/Conjurefile.localhost.base -c $CONJUREUP_TESTDIR/deployments/Conjurefile.localhost.canonical-kubernetes"
+exit $?
