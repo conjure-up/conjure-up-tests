@@ -2,6 +2,8 @@
 
 set -eux
 
+whoami
+
 . vars
 
 git clone https://github.com/conjure-up/conjure-up $CONJUREUP_BASEDIR
@@ -21,7 +23,5 @@ sudo ln -s /snap/bin/juju /usr/bin/juju || true
 sudo bash -c 'for i in 5 10 15 30; do [[ -e /var/snap/lxd/common/lxd/unix.socket ]] && break; sleep $i; done'
 sudo -E su "$USER" -c "/snap/bin/lxd init --auto"
 sudo -E su "$USER" -c "/snap/bin/lxc network set lxdbr1 ipv6.address none || true"
-
-cd "$CONJUREUP_BASEDIR" && tox -e py35,flake,isort
-cd "$CONJUREUP_BASEDIR" && sudo python3 setup.py install
-
+sudo -E su "$USER" -c "cd $CONJUREUP_BASEDIR && tox -e py35,flake,isort"
+sudo -E su "$USER" -c "cd $CONJUREUP_BASEDIR && tox -e conjure-dev"

@@ -4,6 +4,5 @@ set -eux
 
 . vars
 
-conjure-up -c $CONJUREUP_TESTDIR/deployments/Conjurefile.localhost.base \
-           -c $CONJUREUP_TESTDIR/deployments/Conjurefile.localhost.openstack-novalxd
+sudo -E su "$USER" -c "conjure-up -c $CONJUREUP_TESTDIR/deployments/Conjurefile.localhost.base -c $CONJUREUP_TESTDIR/deployments/Conjurefile.localhost.openstack-novalxd"
 echo $?

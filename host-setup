@@ -2,7 +2,6 @@
 #
 # Basic node setup
 set -eux
-ls -l
 juju switch jenkins-ci-aws
 juju destroy-model conjure-up-tester -y --destroy-storage || true
 juju add-model conjure-up-tester
