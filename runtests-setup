@@ -24,4 +24,5 @@ sudo -E su "$USER" -c "/snap/bin/lxc network set lxdbr1 ipv6.address none || tru
 
 cd "$CONJUREUP_BASEDIR" && tox -e py35,flake,isort
 cd "$CONJUREUP_BASEDIR" && tox -e conjure-dev
-cd "$CONJUREUP_BASEDIR" && make install
+cd "$CONJUREUP_BASEDIR" && make snap
+cd "$CONJUREUP_BASEDIR" && sudo snap install ./conjure-up*snap --classic --dangerous
