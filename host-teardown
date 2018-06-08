@@ -2,4 +2,4 @@
 #
 # Basic teardown setup
 juju switch jenkins-ci-aws
-juju destroy-model conjure-up-tester -y || true
+juju destroy-model conjure-up-tester -y --destroy-storage || true
