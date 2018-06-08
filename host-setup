@@ -1,6 +1,7 @@
 #!/bin/bash
 #
 # Basic node setup
+set -eux
 juju switch jenkins-ci-aws
 juju destroy-model conjure-up-tester -y || true
 juju add-model conjure-up-tester
@@ -8,6 +9,5 @@ juju switch jenkins-ci-aws:conjure-up-tester
 juju deploy ubuntu --constraints "mem=8G root-disk=100G cores=8"
 juju-wait -w
 juju ssh ubuntu/0 sudo apt-get update && sudo apt-get install git -qyf
-juju ssh ubuntu/0 sudo apt-get remove
 juju ssh ubuntu/0 git clone -q https://github.com/conjure-up/conjure-up-tests /home/ubuntu/conjure-up-tests
 juju ssh ubuntu/0 cd /home/ubuntu/conjure-up-tests && ./runtests-setup
