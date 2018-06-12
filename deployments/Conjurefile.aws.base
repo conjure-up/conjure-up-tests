@@ -1,6 +1,6 @@
 # -*- mode:yaml; -*-
 
-cloud: localhost
+cloud: aws/us-east-1
 color: false
 no-report: true
 no-track: true

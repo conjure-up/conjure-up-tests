@@ -2,8 +2,6 @@
 
 set -eux
 
-whoami
-
 . vars
 
 git clone https://github.com/conjure-up/conjure-up $CONJUREUP_BASEDIR

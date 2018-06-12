@@ -1,0 +1,10 @@
+#!/bin/bash
+
+set -eux
+
+. vars
+
+sudo -E su "$USER" -c "source $CONJUREUP_BASEDIR/conjure-dev/bin/activate && conjure-up -c $CONJUREUP_TESTDIR/deployments/Conjurefile.aws.base -c $CONJUREUP_TESTDIR/deployments/Conjurefile.aws.canonical-kubernetes"
+cat ~/.cache/conjure-up/conjure-up.log || true
+juju destroy-model -y conjure-up-tester
+exit $?

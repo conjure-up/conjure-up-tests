@@ -1,0 +1,5 @@
+# -*- mode:yaml; -*-
+
+spell: canonical-kubernetes
+controller: jenkins-ci-aws
+model: conjure-up-tester
