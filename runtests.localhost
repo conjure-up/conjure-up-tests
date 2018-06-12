@@ -3,6 +3,11 @@
 # Basic node setup
 set -eux
 
+. vars
+
+# Deployment
+: "${CI_DEPLOYMENT:=runtests.localhost.kubernetes}"
+
 # Juju controller to use
 : "${CI_CONTROLLER:=juju-ci-aws}"
 
@@ -11,20 +16,12 @@ set -eux
 
 juju switch "$CI_CONTROLLER"
 juju destroy-model "$CI_CONTROLLER":"$CI_MODEL" -y --destroy-storage || true
+juju add-model -c "$CI_CONTROLLER" "$CI_MODEL"
+juju switch "$CI_CONTROLLER":"$CI_MODEL"
+juju deploy -m "$CI_CONTROLLER":"$CI_MODEL" ubuntu --constraints "mem=32G root-disk=100G cores=16"
+juju-wait -e "$CI_CONTROLLER":"$CI_MODEL" -w
 
-juju add-model conjure-up-tester
-juju switch jenkins-ci-aws:conjure-up-tester
-juju deploy ubuntu --constraints "mem=32G root-disk=100G cores=16"
-juju-wait -w
-juju status
-juju ssh ubuntu/0 "sudo apt-get update && sudo apt-get install git -qyf"
-juju ssh ubuntu/0 "git clone -q https://github.com/conjure-up/conjure-up-tests /home/ubuntu/conjure-up-tests"
-juju ssh ubuntu/0 "cd /home/ubuntu/conjure-up-tests && ./runtests-setup"
-
-. vars
-
-git clone https://github.com/conjure-up/conjure-up $CONJUREUP_BASEDIR
-
+remote_script="$(cat <<'EOF'
 sudo add-apt-repository -y ppa:jonathonf/python-3.6
 sudo apt-get update -q
 sudo apt-get remove -qy lxd lxd-client
@@ -40,5 +37,11 @@ sudo ln -s /snap/bin/juju /usr/bin/juju || true
 sudo bash -c 'for i in 5 10 15 30; do [[ -e /var/snap/lxd/common/lxd/unix.socket ]] && break; sleep $i; done'
 sudo -E su "$USER" -c "/snap/bin/lxd init --auto"
 sudo -E su "$USER" -c "/snap/bin/lxc network set lxdbr1 ipv6.address none || true"
+git clone https://github.com/conjure-up/conjure-up $CONJUREUP_BASEDIR
 sudo -E su "$USER" -c "cd $CONJUREUP_BASEDIR && tox -e py35,flake,isort"
 sudo -E su "$USER" -c "cd $CONJUREUP_BASEDIR && tox -e conjure-dev"
+EOF
+)"
+
+
+
