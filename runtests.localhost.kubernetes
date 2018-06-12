@@ -4,5 +4,7 @@ set -eux
 
 . vars
 
-sudo -E su ubuntu -c "source $CONJUREUP_BASEDIR/conjure-dev/bin/activate && conjure-up -c $CONJUREUP_TESTDIR/deployments/Conjurefile.localhost.base -c $CONJUREUP_TESTDIR/deployments/Conjurefile.localhost.canonical-kubernetes" || cat ~/.cache/conjure-up/conjure-up.log
+whoami
+ls -l /home/ubuntu/conjure-up-tests
+sudo -E su ubuntu -c "source $CONJUREUP_BASEDIR/conjure-dev/bin/activate && conjure-up -c $CONJUREUP_TESTDIR/deployments/Conjurefile.localhost.base -c $CONJUREUP_TESTDIR/deployments/Conjurefile.localhost.canonical-kubernetes" && cat ~/.cache/conjure-up/conjure-up.log
 exit $?
