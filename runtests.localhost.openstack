@@ -2,7 +2,17 @@
 
 set -eux
 
-. vars
+config="$(cat <<'EOF'
+spell: openstack-novalxd
+cloud: localhost
+color: false
+no-report: true
+no-track: true
+controller: $CI_CONTROLLER
+model: $CI_MODEL
+EOF
+)"
 
-sudo -E su "$USER" -c "conjure-up -c $CONJUREUP_TESTDIR/deployments/Conjurefile.localhost.base -c $CONJUREUP_TESTDIR/deployments/Conjurefile.localhost.openstack-novalxd"
-echo $?
+juju ssh -m "$CI_CONTROLLER":"$CI_MODEL" ubuntu/0 "cat $config > Conjurefile"
+juju ssh -m "$CI_CONTROLLER":"$CI_MODEL" ubuntu/0 "conjure-up -c Conjurefile"
+exit $?
