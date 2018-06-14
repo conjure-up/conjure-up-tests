@@ -1,3 +1,4 @@
 # -*- mode:yaml; -*-
 
 spell: canonical-kubernetes
+model: k8s-test-1

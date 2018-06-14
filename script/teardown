@@ -1,0 +1,12 @@
+#!/bin/bash
+
+set -e
+
+# Juju controller to use
+: "${CI_CONTROLLER:=juju-ci-aws}"
+
+# Juju model to use
+: "${CI_MODEL:=conjure-up-tester}"
+
+juju switch "$CI_CONTROLLER"
+juju destroy-model "$CI_CONTROLLER":"$CI_MODEL" -y --destroy-storage || true
