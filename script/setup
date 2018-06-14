@@ -3,7 +3,7 @@
 set -e
 
 # Juju controller to use
-: "${CI_CONTROLLER:=juju-ci-aws}"
+: "${CI_CONTROLLER:=jenkins-ci-aws}"
 
 # Juju model to use
 : "${CI_MODEL:=conjure-up-tester}"
