@@ -16,7 +16,7 @@ juju destroy-model "$CI_CONTROLLER":"$CI_MODEL" -y --destroy-storage || true
 juju add-model -c "$CI_CONTROLLER" "$CI_MODEL"
 juju switch "$CI_CONTROLLER":"$CI_MODEL"
 juju deploy -m "$CI_CONTROLLER":"$CI_MODEL" ubuntu --constraints "mem=32G root-disk=100G cores=16"
-juju-wait -e "$CI_CONTROLLER":"$CI_MODEL" -w
+juju-wait -wm "$CI_CONTROLLER":"$CI_MODEL"
 
 prep_script="$(cat <<'EOF'
     sudo add-apt-repository -y ppa:jonathonf/python-3.6
