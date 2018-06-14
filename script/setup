@@ -18,25 +18,27 @@ juju switch "$CI_CONTROLLER":"$CI_MODEL"
 juju deploy -m "$CI_CONTROLLER":"$CI_MODEL" ubuntu --constraints "mem=32G root-disk=100G cores=16"
 juju-wait -e "$CI_CONTROLLER":"$CI_MODEL" -w
 
-prep_script="$(cat <<'EOF'
-    sudo add-apt-repository -y ppa:jonathonf/python-3.6
-    sudo apt-get update -q
-    sudo apt-get remove -qy lxd lxd-client
-    sudo apt-get -y install jq bsdtar python3.6-dev make snapd libsodium-dev python3-pip git
-    sudo -H pip3 install tox
-    sudo snap install juju --classic || sudo snap refresh juju
-    sudo snap install lxd || sudo snap refresh lxd
-    sudo snap install juju-wait --classic
-    sudo addgroup lxd || true
-    sudo usermod -a -G lxd "$USER" || true
-    sudo ln -s /snap/bin/lxc /usr/bin/lxc || true
-    sudo ln -s /snap/bin/juju /usr/bin/juju || true
-    sudo bash -c 'for i in 5 10 15 30; do [[ -e /var/snap/lxd/common/lxd/unix.socket ]] && break; sleep $i; done'
-    sudo -E su "$USER" -c "/snap/bin/lxd init --auto"
-    sudo -E su "$USER" -c "/snap/bin/lxc network set lxdbr1 ipv6.address none || true"
-    sudo snap install conjure-up --classic --$CI_SNAP_CHANNEL
-    sudo ln -s /snap/bin/conjure-up /usr/bin/conjure-up || true
+tmpfile=$(mktemp)
+cat <<EOF> "$tmpfile"
+#sudo add-apt-repository -y ppa:jonathonf/python-3.6
+#sudo apt-get update -q
+#sudo apt-get -y install jq bsdtar python3.6-dev make snapd libsodium-dev python3-pip git
+#sudo -H pip3 install tox
+sudo apt-get remove -qy lxd lxd-client
+sudo snap install juju --classic || sudo snap refresh juju
+sudo snap install lxd || sudo snap refresh lxd
+sudo snap install juju-wait --classic
+sudo addgroup lxd || true
+sudo usermod -a -G lxd ubuntu
+sudo ln -s /snap/bin/lxc /usr/bin/lxc
+sudo ln -s /snap/bin/juju /usr/bin/juju
+sudo bash -c "for (( ; ; )); do [[ -e /var/snap/lxd/common/lxd/unix.socket ]] && break; sleep 5; done"
+sudo -E su ubuntu -c "/snap/bin/lxd init --auto"
+sudo -E su ubuntu -c "/snap/bin/lxc network set lxdbr1 ipv6.address none"
+sudo -E su ubuntu -c "/snap/bin/lxc version"
+sudo snap install conjure-up --classic --$CI_SNAP_CHANNEL
+sudo ln -s /snap/bin/conjure-up /usr/bin/conjure-up
 EOF
-)"
 
-juju ssh -m "$CI_CONTROLLER":"$CI_MODEL" ubuntu/0 "$prep_script"
+juju scp -m "$CI_CONTROLLER":"$CI_MODEL" "$tmpfile" ubuntu/0:setup
+juju ssh -m "$CI_CONTROLLER":"$CI_MODEL" ubuntu/0 "bash setup"

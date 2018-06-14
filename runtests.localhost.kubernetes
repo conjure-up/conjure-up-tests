@@ -2,17 +2,16 @@
 
 set -eux
 
-config="$(cat <<'EOF'
+tmpfile=$(mktemp)
+
+cat <<EOF> "$tmpfile"
 spell: canonical-kubernetes
 cloud: localhost
 color: false
 no-report: true
 no-track: true
-controller: $CI_CONTROLLER
-model: $CI_MODEL
 EOF
-)"
 
-juju ssh -m "$CI_CONTROLLER":"$CI_MODEL" ubuntu/0 "cat $config > Conjurefile"
+juju scp -m "$CI_CONTROLLER":"$CI_MODEL" "$tmpfile" ubuntu/0:Conjurefile
 juju ssh -m "$CI_CONTROLLER":"$CI_MODEL" ubuntu/0 "conjure-up -c Conjurefile"
 exit $?
