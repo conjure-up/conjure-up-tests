@@ -1,0 +1,15 @@
+#!/bin/bash
+
+set -eux
+
+tmpfile=$(mktemp)
+cat <<EOF> "$tmpfile"
+spell: microk8s
+color: false
+no-report: true
+no-track: true
+EOF
+
+juju scp -m "$CI_CONTROLLER":"$CI_MODEL" "$tmpfile" ubuntu/0:Conjurefile
+juju ssh -m "$CI_CONTROLLER":"$CI_MODEL" ubuntu/0 "conjure-up -c Conjurefile"
+exit $?
