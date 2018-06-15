@@ -8,5 +8,7 @@ set -e
 # Juju model to use
 : "${CI_MODEL:=conjure-up-tester}"
 
-juju switch "$CI_CONTROLLER"
+juju ssh -m "$CI_CONTROLLER":"$CI_MODEL" ubuntu/0 "cat /home/ubuntu/.cache/conjure-up/conjure-up.log"
+juju ssh -m "$CI_CONTROLLER":"$CI_MODEL" ubuntu/0 "juju status --format yaml"
+juju ssh -m "$CI_CONTROLLER":"$CI_MODEL" ubuntu/0 "lxc list && lxc config show && lxc profile show default"
 juju destroy-model "$CI_CONTROLLER":"$CI_MODEL" -y --destroy-storage || true

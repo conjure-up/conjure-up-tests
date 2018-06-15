@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -e
+set -ex
 
 # Juju controller to use
 : "${CI_CONTROLLER:=jenkins-ci-aws}"
@@ -11,11 +11,14 @@ set -e
 # Snap channel
 : "${CI_SNAP_CHANNEL:=edge}"
 
+# Series
+: "${CI_SERIES:=xenial}"
+
 juju switch "$CI_CONTROLLER"
 juju destroy-model "$CI_CONTROLLER":"$CI_MODEL" -y --destroy-storage || true
 juju add-model -c "$CI_CONTROLLER" "$CI_MODEL"
 juju switch "$CI_CONTROLLER":"$CI_MODEL"
-juju deploy -m "$CI_CONTROLLER":"$CI_MODEL" ubuntu --constraints "mem=32G root-disk=100G cores=16"
+juju deploy -m "$CI_CONTROLLER":"$CI_MODEL" ubuntu --constraints "mem=32G root-disk=100G cores=16" --series "$CI_SERIES"
 juju-wait -e "$CI_CONTROLLER":"$CI_MODEL" -w
 
 tmpfile=$(mktemp)
@@ -34,11 +37,12 @@ sudo ln -s /snap/bin/lxc /usr/bin/lxc
 sudo ln -s /snap/bin/juju /usr/bin/juju
 sudo bash -c "for (( ; ; )); do [[ -e /var/snap/lxd/common/lxd/unix.socket ]] && break; sleep 5; done"
 sudo -E su ubuntu -c "/snap/bin/lxd init --auto"
-sudo -E su ubuntu -c "/snap/bin/lxc network set lxdbr1 ipv6.address none"
-sudo -E su ubuntu -c "/snap/bin/lxc version"
+sudo -E su ubuntu -c "/snap/bin/lxc network set lxdbr1 ipv6.address none || true"
+sudo -E su ubuntu -c "/snap/bin/lxc network set lxdbr0 ipv6.address none || true"
+sudo -E su ubuntu -c "/snap/bin/lxc profile show default && /snap/bin/lxc config show && /snap/bin/lxc network list && /snap/bin/lxc storage list"
 sudo snap install conjure-up --classic --$CI_SNAP_CHANNEL
 sudo ln -s /snap/bin/conjure-up /usr/bin/conjure-up
 EOF
 
 juju scp -m "$CI_CONTROLLER":"$CI_MODEL" "$tmpfile" ubuntu/0:setup
-juju ssh -m "$CI_CONTROLLER":"$CI_MODEL" ubuntu/0 "bash setup"
+juju ssh -m "$CI_CONTROLLER":"$CI_MODEL" ubuntu/0 "bash -x setup"
