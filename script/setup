@@ -11,6 +11,9 @@ set -ex
 # Snap channel
 : "${CI_SNAP_CHANNEL:=edge}"
 
+# Juju snap channel
+: "${CI_JUJU_SNAP_CHANNEL:=stable}"
+
 # Series
 : "${CI_SERIES:=xenial}"
 
@@ -28,7 +31,7 @@ cat <<EOF> "$tmpfile"
 #sudo apt-get -y install jq bsdtar python3.6-dev make snapd libsodium-dev python3-pip git
 #sudo -H pip3 install tox
 sudo apt-get remove -qy lxd lxd-client
-sudo snap install juju --classic || sudo snap refresh juju
+sudo snap install juju --classic --$CI_JUJU_SNAP_CHANNEL || sudo snap refresh juju --$CI_JUJU_SNAP_CHANNEL
 sudo snap install lxd || sudo snap refresh lxd
 sudo snap install juju-wait --classic
 sudo addgroup lxd || true
