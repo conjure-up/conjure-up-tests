@@ -9,6 +9,7 @@ cloud: localhost
 color: false
 no-report: true
 no-track: true
+debug: true
 EOF
 
 juju scp -m "$CI_CONTROLLER":"$CI_MODEL" "$tmpfile" ubuntu/0:Conjurefile
